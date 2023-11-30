@@ -1,0 +1,216 @@
+"use client";
+// Commodities.tsx
+import { useState, useEffect } from 'react';
+import { Loading, Notify } from 'notiflix';
+import { GetToken } from '@/app/utils/Auth';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+
+interface City {
+    name: string;
+}
+interface Category {
+    title: string;
+}
+interface Commodity {
+    id: number;
+    category_id: number;
+    title: string;
+    description: string;
+    price: number;
+    city_id: number;
+    picture: string;
+    city: City;
+    category: Category;
+}
+
+function Commodities() {
+    const [commodities, setCommodities] = useState<Commodity[]>([]);
+    const [newCommodity, setNewCommodity] = useState({
+        category_id: 0,
+        title: '',
+        description: '',
+        price: 0,
+        city_id: 0,
+        picture: '',
+    });
+
+    const router = useRouter();
+
+    useEffect(() => {
+        // Fetch commodities from /commodities endpoint
+        const fetchCommodities = async () => {
+            Loading.pulse();
+            const token = GetToken();
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                const data = await response.json();
+                setCommodities(data.commodities);
+                Loading.remove();
+            } catch (error) {
+                console.error('Error fetching commodities:', error);
+            }
+        };
+
+        fetchCommodities();
+    }, []);
+
+    const handleDeleteCommodity = async (id: number) => {
+        const token = GetToken();
+        Loading.pulse();
+        try {
+            // Delete commodity with the specified id
+            await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            // Update state to reflect the deletion
+            setCommodities((prevCommodities) =>
+                prevCommodities.filter((commodity) => commodity.id !== id)
+            );
+            Loading.remove();
+            Notify.init({
+                width: '300px',
+                position: 'left-bottom',
+            });
+            Notify.success('کالا با موفقیت حذف شد');
+        } catch (error) {
+            console.error('Error deleting commodity:', error);
+        }
+    };
+
+    const handleEditCommodity = (id: number, field: string, value: any) => {
+        // Update commodity locally
+        setCommodities((prevCommodities) =>
+            prevCommodities.map((commodity) =>
+                commodity.id === id ? { ...commodity, [field]: value } : commodity
+            )
+        );
+    };
+
+    const handleEditCommoditySubmit = async (id: number, updatedCommodity: Commodity) => {
+        const token = GetToken();
+        Loading.pulse();
+        try {
+            // Send request to update commodity with the specified id
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/${id}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(updatedCommodity),
+                }
+            );
+
+            if (response.ok) {
+                Loading.remove();
+                Notify.init({
+                    width: '300px',
+                    position: 'left-bottom',
+                });
+                Notify.success('کالا با موفقیت ویرایش شد');
+            } else {
+                console.error('Failed to edit commodity:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error editing commodity:', error);
+        }
+    };
+
+    const handleAddCommodity = async (event: React.FormEvent) => {
+        event.preventDefault();
+        const token = GetToken();
+        try {
+            // Post new commodity with the specified data
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(newCommodity),
+            });
+
+            if (response.ok) {
+                const newCommodityData = await response.json();
+                setCommodities((prevCommodities) => [...prevCommodities, newCommodityData.commodity]);
+                setNewCommodity({
+                    category_id: 0,
+                    title: '',
+                    description: '',
+                    price: 0,
+                    city_id: 0,
+                    picture: '',
+                }); // Clear the input fields after successful submission
+                Notify.init({
+                    width: '300px',
+                    position: 'left-bottom',
+                });
+                Notify.success('کالا با موفقیت افزوده شد');
+            } else {
+                console.error('Failed to add commodity:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error adding commodity:', error);
+        }
+    };
+
+    return (
+        <div>
+            <h1>مدیریت کالاها</h1>
+            <div className='flex justify-center flex-col items-center'>
+                <table className="table-auto border-collapse w-[1000px] text-center md:w-full">
+                    <thead>
+                        <tr>
+                            <th className="border text-blue-800 bg-slate-300">#</th>
+                            <th className="border text-blue-800 bg-slate-300">نام</th>
+                            <th className="border text-blue-800 bg-slate-300">توضیحات</th>
+                            <th className="border text-blue-800 bg-slate-300">قیمت</th>
+                            <th className="border text-blue-800 bg-slate-300">شهر</th>
+                            <th className="border text-blue-800 bg-slate-300">دسته بندی</th>
+                            <th className="border text-blue-800 bg-slate-300">تصویر</th>
+                            <th className="border text-blue-800 bg-slate-300">ویرایش</th>
+                            <th className="border text-blue-800 bg-slate-300">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {commodities.map((commodity) => (
+                            <tr key={commodity.id}>
+                                <td className="border border-slate-300">{commodity.id}</td>
+                                <td className="border border-slate-300">{commodity.title}</td>
+                                <td className="border border-slate-300">{commodity.description}</td>
+                                <td className="border border-slate-300">{commodity.price} تومان</td>
+                                <td className="border border-slate-300">{commodity.city?.name}</td>
+                                <td className="border border-slate-300">{commodity.category?.title}</td>
+                                <td className="border border-slate-300 flex justify-center">
+                                    <Image loader={() => `${process.env.NEXT_PUBLIC_BACKEND_URL}${commodity.picture}`} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${commodity.picture}`} width={200} height={150} alt={commodity.title} className='m-2' />
+                                </td>
+                                <td className="border border-slate-300">
+                                    <button className=" text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => router.push(`/dashboard/commodities/edit?commodityId=${commodity.id}`)}>
+                                        ویرایش
+                                    </button>
+                                </td>
+                                <td className="border border-slate-300">
+                                    <button className=" text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => handleDeleteCommodity(commodity.id)}>حذف</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    );
+}
+
+export default Commodities;
