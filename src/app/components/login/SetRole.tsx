@@ -183,7 +183,7 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
               <label className="mb-2">انتخاب دسته بندی:</label>
 
 
-              <div className="flex gap-2 my-2">
+              <div className="flex gap-2 my-2 flex-wrap">
                 {categories.map((category) => (
                   <div key={category.id}>
                     <button
@@ -198,7 +198,7 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
             </div>
             <div className="flex flex-col mb-4">
               <label className="mb-2">انتخاب دپارتمان:</label>
-              <div className="flex gap-2 my-2">
+              <div className="flex gap-2 my-2 flex-wrap">
                 {departments.map((department) => (
                   <div key={department.id}>
                     <button
