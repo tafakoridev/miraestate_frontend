@@ -113,7 +113,7 @@ const AuctionCMP: React.FC = () => {
             <div className="flex md:w-1/3 w-full md:justify-center items-center flex-col md:flex-row gap-5 md:gap-0">
               {/* Logo Image */}
               <div className="w-2/6 mr-5">
-                <Image src="/assets/mira_logo.png" alt="Logo" width={170} height={50} priority={true} />
+                <Image onClick={() => router.push('/')} src="/assets/mira_logo.png" alt="Logo" width={170} height={50} priority={true} />
               </div>
 
               <div className="relative md:w-4/6 h-full">

@@ -2,16 +2,51 @@
 "use client"
 // components/Home.tsx
 import Image from 'next/image';
+
+
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { GetToken } from './utils/Auth';
+import { GetToken, GetUser, IsLogin } from './utils/Auth';
 import { Loading } from 'notiflix';
 import Kala from './components/home/kala';
 import LocationSelector from './components/home/LocationSelector';
 import Commodity from './components/home/Commodity';
+import Agents from './components/home/Agents';
+import AgentShow from './components/home/AgentShow';
 interface Category {
   id: number;
   title: string;
+}
+
+
+
+interface IUser {
+  created_at: string;
+  gender: string | null;
+  id: number;
+  name: string | null;
+  national_code: string | null;
+  phonenumber: string;
+  role: string;
+  state: string;
+  updated_at: string;
+  department_expertises: IAgentExpertise[];
+  category_expertises: IAgentExpertise[];
+}
+
+interface Field {
+  title: string;
+}
+
+interface IAgentExpertise {
+  id: number;
+  expertiese_id: number;
+  field_id: number;
+  field_type: string;
+  // Add other columns as needed
+  created_at: string;
+  updated_at: string;
+  field: Field;
 }
 
 const Home: React.FC = () => {
@@ -19,8 +54,16 @@ const Home: React.FC = () => {
   const [commodities, setCommodities] = useState<any[]>([]);
   const [selectLocation, setSelectLocation] = useState<boolean>(false);
   const [selectedCity, setSelectedCity] = useState<string>("");
+  const [selectedCityId, setSelectedCityId] = useState<number>(0);
   const [commodity_id, setCommodity_id] = useState<string>("");
   const [searchText, setSearchText] = useState<string>("");
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [isLogin, setIsLogin] = useState<boolean | null>(null);
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const [agent_id, setAgentId] = useState<string>("");
+
+
+
   const handleSearch = async () => {
     if (searchText.trim() === "") {
       // If the input is empty, fetch all commodities
@@ -52,18 +95,54 @@ const Home: React.FC = () => {
       console.error('Error fetching categories:', error);
     }
   };
+
   async function setCityFromStorage() {
     let city = localStorage.getItem('city');
     let selectedCity;
     if (city) {
       selectedCity = JSON.parse(city);
       setSelectedCity(selectedCity.name)
+      setSelectedCityId(selectedCity.id)
     }
-    
+
 
     fetchCommodities();
   }
+
+
   useEffect(() => {
+    // ... (existing code)
+
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/agents/${selectedCityId}/list`
+        );
+        const data = await response.json();
+
+        setUsers(data);
+        Loading.remove();
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+    if (selectedCity)
+      fetchUsers();
+  }, [selectedCity]);
+
+  useEffect(() => {
+
+
+    const checkIsLoggedIn = async () => {
+      setUser(await GetUser())
+      const isLoggedIn = await IsLogin();
+      setIsLogin(isLoggedIn);
+    };
+
+
+
+
+
     setCityFromStorage()
     // Replace the URL with your actual API endpoint for categories
     const fetchCategories = async () => {
@@ -84,21 +163,30 @@ const Home: React.FC = () => {
       }
     };
 
+    if (isLogin === null) {
+      checkIsLoggedIn();
 
+    }
     fetchCategories();
 
   }, []);
   const router = useRouter();
   return (
     <div className="flex flex-col min-h-screen h-screen bg-gray-200 overflow-auto overflow-x-hidden">
+      {agent_id && <AgentShow agentId={agent_id} onClose={() => setAgentId('')} />}
       {commodity_id && <Commodity id={commodity_id} onClose={() => { setCommodity_id("") }} key={1} />}
       {selectLocation && <LocationSelector onClose={() => { setSelectLocation(!selectLocation); setCityFromStorage(); }} />}
       {/* Top Gray Bar */}
-      <div className="sticky top-0 w-full md:h-[150px] h-[250px] bg-gray-100 flex items-center justify-start gap-2 px-4 ">
+      <div className="sticky top-0 z-50 w-full md:h-[150px] h-[250px] bg-gray-100 flex items-center justify-start gap-2 px-4 ">
         <div className='visible absolute left-1 top-2 md:invisible flex justify-end items-center px-2'>
-          <button onClick={() => router.push("/login")} className='bg-white justify-self-start float-left w-[90px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs'>
-            ورود / ثبت نام
-          </button>
+          {isLogin
+            ? <button className='bg-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs'>
+              {user?.name ?? 'نام شما'}
+            </button>
+            : <button onClick={() => router.push("/login")} className='bg-white justify-self-start float-left w-[90px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs'>
+              ورود / ثبت نام
+            </button>
+          }
         </div>
 
         <div className='visible absolute left-1 bottom-2 flex justify-end items-center px-2'>
@@ -113,7 +201,7 @@ const Home: React.FC = () => {
             <div className="flex md:w-1/3 w-full md:justify-center items-center flex-col md:flex-row gap-5 md:gap-0">
               {/* Logo Image */}
               <div className="w-2/6 mr-5">
-                <Image src="/assets/mira_logo.png" alt="Logo" width={170} height={50} priority={true} />
+                <Image onClick={() => router.push('/')} src="/assets/mira_logo.png" alt="Logo" width={170} height={50} priority={true} />
               </div>
 
               <div className="relative md:w-4/6 h-full">
@@ -135,9 +223,15 @@ const Home: React.FC = () => {
             </div>
 
             <div className='hidden md:flex  justify-end w-2/3 h-full items-center px-3'>
-              <button onClick={() => router.push("/login")} className='bg-white justify-self-start float-left w-[120px] h-[50px] rounded-md border border-gray-300 shadow-sm'>
-                ورود / ثبت نام
-              </button>
+              {isLogin
+                ? <button className='bg-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs'>
+                  {user?.name ?? 'نام شما'}
+                </button>
+
+                : <button onClick={() => router.push("/login")} className='bg-white justify-self-start float-left w-[120px] h-[50px] rounded-md border border-gray-300 shadow-sm'>
+                  ورود / ثبت نام
+                </button>
+              }
             </div>
 
 
@@ -158,10 +252,16 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-
-
+      <div className="flex-grow flex flex-col items-center gap-10 justify-start pt-24">
+        <h2 className='text-lg'>کارشناسان مورد تایید</h2>
+        {users &&
+          <Agents users={users} choseAgent={async(id: string) => setAgentId(id)}/>
+        }
+      </div>
       {/* Main Content */}
       <main className="flex-grow flex flex-col items-center gap-10 justify-start p-24">
+        <h2 className='text-lg'>جدیدترین کالاها و خدمات</h2>
+
         <div className="flex w-full gap-5 flex-wrap justify-center overflow-auto">
           {
             commodities.map((el, i) => (

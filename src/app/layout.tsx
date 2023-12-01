@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { Vazirmatn } from 'next/font/google'
 import './globals.css'
-
+import { Vazirmatn } from 'next/font/google'
 const vazirmatn = Vazirmatn({ subsets: ['latin'], })
 export const metadata: Metadata = {
   title: 'MirimaEstate',

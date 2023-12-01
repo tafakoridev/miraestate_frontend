@@ -17,12 +17,35 @@ interface Department {
   title: string;
 }
 
+interface RequestBody {
+  role: string, categories: Number[], departments: Number[],
+}
+
 const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
   const [selectedRole, setSelectedRole] = useState<string>('');
   const [categories, setCategories] = useState<Category[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [selectedDepartment, setSelectedDepartment] = useState<number | null>(null);
+  const [selectedDepartments, setSelectedDepartments] =  useState<number[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const toggleCategory = (categoryId: number) => {
+    if (selectedCategories.includes(categoryId)) {
+      // If category is already selected, remove it
+      setSelectedCategories(selectedCategories.filter(id => id !== categoryId));
+    } else {
+      // If category is not selected, add it
+      setSelectedCategories([...selectedCategories, categoryId]);
+    }
+  };
+
+  const toggleDepartment = (departmentId: number) => {
+    if (selectedDepartments.includes(departmentId)) {
+      // If category is already selected, remove it
+      setSelectedDepartments(selectedDepartments.filter(id => id !== departmentId));
+    } else {
+      // If category is not selected, add it
+      setSelectedDepartments([...selectedDepartments, departmentId]);
+    }
+  };
 
   useEffect(() => {
     // Fetch categories from /api/categories
@@ -36,7 +59,7 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
           },
         });
         const data = await response.json();
-        
+
         setCategories(data.categories);
         Loading.remove();
       } catch (error) {
@@ -71,16 +94,8 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
 
   const handleRoleChange = (role: string) => {
     setSelectedRole(role);
-    // Reset selectedCategory when the role changes
-    setSelectedCategory(null);
-  };
-
-  const handleCategoryChange = (categoryId: number) => {
-    setSelectedCategory(categoryId);
-  };
-
-  const handleDepartmentChange = (departmentId: number) => {
-    setSelectedDepartment(departmentId);
+    setSelectedCategories([]);
+    setSelectedDepartments([]);
   };
 
   const handleSetRole = async () => {
@@ -90,22 +105,33 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
     }
 
     const token = GetToken();
-    Loading.pulse();
+  
 
     try {
-      const requestBody = { role: selectedRole, category_id: "", department_id: "" };
+      const requestBody: RequestBody = { role: selectedRole, categories: [], departments: [] };
 
       // If the selected role is 'agent', include the selected category and department
       if (selectedRole === 'agent') {
-        if (!selectedCategory) {
-          Notify.warning('لطفاً یک دسته بندی را انتخاب کنید');
+        if (selectedCategories.length == 0) {
+          Notify.init({
+            position: "left-bottom",
+          })
+          Notify.warning('لطفاً حداقل یک دسته بندی را انتخاب کنید');
           return;
         }
 
-        requestBody.category_id = `${selectedCategory}`;
-        requestBody.department_id = `${selectedDepartment}`;
-      }
+        if (selectedDepartments.length == 0) {
+          Notify.init({
+            position: "left-bottom",
+          })
+          Notify.warning('لطفاً حداقل یک دپارتمان  را انتخاب کنید');
+          return;
+        }
 
+        requestBody.categories = selectedCategories;
+        requestBody.departments = selectedDepartments;
+      }
+      Loading.pulse();
       // Post method to set user role
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/role/set`, {
         method: 'POST',
@@ -116,12 +142,12 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
         body: JSON.stringify(requestBody),
       });
 
+      Loading.remove();
       if (response.ok) {
-        Loading.remove();
         Notify.init({
           width: '300px',
           position: 'left-bottom',
-          });
+        });
         Notify.success('نقش کاربر با موفقیت تنظیم شد');
         onClose(); // Close the modal after successfully setting the role
       } else {
@@ -155,38 +181,36 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
           <>
             <div className="flex flex-col mb-4">
               <label className="mb-2">انتخاب دسته بندی:</label>
-              <select
-                value={selectedCategory || ''}
-                onChange={(e) => handleCategoryChange(Number(e.target.value))}
-                className="bg-gray-100 p-2 rounded-md"
-              >
-                <option value="" disabled>
-                  انتخاب کنید
-                </option>
+
+
+              <div className="flex gap-2 my-2">
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.title}
-                  </option>
+                  <div key={category.id}>
+                    <button
+                      className={`px-2 mb-0 mt-1 py-1 rounded-md ${selectedCategories.includes(category.id) ? 'border-2 border-blue-800' : 'border border-gray-400'}`}
+                      onClick={() => toggleCategory(category.id)}
+                    >
+                      {category.title}
+                    </button>
+                  </div>
                 ))}
-              </select>
+              </div>
             </div>
             <div className="flex flex-col mb-4">
               <label className="mb-2">انتخاب دپارتمان:</label>
-              <select
-                value={selectedDepartment || ''}
-                onChange={(e) => handleDepartmentChange(Number(e.target.value))}
-                className="bg-gray-100 p-2 rounded-md"
-                disabled={!selectedCategory}
-              >
-                <option value="" disabled>
-                  انتخاب کنید
-                </option>
+              <div className="flex gap-2 my-2">
                 {departments.map((department) => (
-                  <option key={department.id} value={department.id}>
-                    {department.title}
-                  </option>
+                  <div key={department.id}>
+                    <button
+                      className={`px-2 mb-0 mt-1 py-1 rounded-md ${selectedDepartments.includes(department.id) ? 'border-2 border-blue-800' : 'border border-gray-400'}`}
+                      onClick={() => toggleDepartment(department.id)}
+                    >
+                      {department.title}
+                    </button>
+                    
+                  </div>
                 ))}
-              </select>
+              </div>
             </div>
           </>
         )}
