@@ -5,6 +5,7 @@ import { Loading, Notify } from 'notiflix';
 import { GetToken } from '@/app/utils/Auth';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import moment from 'moment';
 
 interface City {
     name: string;
@@ -22,6 +23,7 @@ interface Commodity {
     picture: string;
     city: City;
     category: Category;
+    expired_at: string;
 }
 
 function Commodities() {
@@ -34,6 +36,16 @@ function Commodities() {
         city_id: 0,
         picture: '',
     });
+
+    function remainedDays(expiredAtString: string): number {
+        const expiredAt = moment(expiredAtString);
+
+        // Calculate the difference in days
+            const daysRemaining = expiredAt.diff(moment(), 'days');
+        return daysRemaining;
+    }
+
+
 
     const router = useRouter();
 
@@ -167,7 +179,7 @@ function Commodities() {
 
     return (
         <div>
-            <h1>مدیریت کالاها</h1>
+            <h1>مدیریت کالا و خدمات</h1>
             <div className='flex justify-center flex-col items-center'>
                 <table className="table-auto border-collapse w-[1000px] text-center md:w-full">
                     <thead>
@@ -181,6 +193,7 @@ function Commodities() {
                             <th className="border text-blue-800 bg-slate-300">تصویر</th>
                             <th className="border text-blue-800 bg-slate-300">ویرایش</th>
                             <th className="border text-blue-800 bg-slate-300">حذف</th>
+                            <th className="border text-blue-800 bg-slate-300">انقضا</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -189,19 +202,22 @@ function Commodities() {
                                 <td className="border border-slate-300">{commodity.id}</td>
                                 <td className="border border-slate-300">{commodity.title}</td>
                                 <td className="border border-slate-300">{commodity.description}</td>
-                                <td className="border border-slate-300">{commodity.price} تومان</td>
-                                <td className="border border-slate-300">{commodity.city?.name}</td>
-                                <td className="border border-slate-300">{commodity.category?.title}</td>
-                                <td className="border border-slate-300 flex justify-center">
-                                    <Image loader={() => `${process.env.NEXT_PUBLIC_BACKEND_URL}${commodity.picture}`} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${commodity.picture}`} width={200} height={150} alt={commodity.title} className='m-2' />
+                                <td className="border border-slate-300 w-1/12">{commodity.price} تومان</td>
+                                <td className="border border-slate-300 w-1/12">{commodity.city?.name}</td>
+                                <td className="border border-slate-300 w-1/12">{commodity.category?.title}</td>
+                                <td className="border border-slate-300 flex justify-center w-1/6">
+                                    <Image loader={() => `${commodity.picture}`} src={`${commodity.picture}`} width={200} height={150} alt={commodity.title} className='m-2' />
                                 </td>
-                                <td className="border border-slate-300">
+                                <td className="border border-slate-300 w-1/12">
                                     <button className=" text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => router.push(`/dashboard/commodities/edit?commodityId=${commodity.id}`)}>
                                         ویرایش
                                     </button>
                                 </td>
-                                <td className="border border-slate-300">
+                                <td className="border border-slate-300 w-1/12">
                                     <button className=" text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => handleDeleteCommodity(commodity.id)}>حذف</button>
+                                </td>
+                                <td className='w-1/12 border border-slate-300 '>
+                                    {remainedDays(commodity.expired_at)} روز دیگر
                                 </td>
                             </tr>
                         ))}

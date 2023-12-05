@@ -159,8 +159,8 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-8 rounded-lg w-96">
+    <div className="fixed top-0 left-0 w-full flex justify-center items-center bg-black bg-opacity-50 z-50 h-full">
+      <div className="bg-white p-8 rounded-lg w-96 h-2/3 overflow-x-auto">
         <h2 className="text-2xl font-bold mb-4"> نقش کاربر</h2>
         <div className="flex flex-col mb-4">
           <label className="mb-2">انتخاب نقش:</label>

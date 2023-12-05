@@ -260,7 +260,7 @@ const Home: React.FC = () => {
       </div>
       {/* Main Content */}
       <main className="flex-grow flex flex-col items-center gap-10 justify-start p-24">
-        <h2 className='text-lg'>جدیدترین کالاها و خدمات</h2>
+        <h2 className='text-lg'>جدیدترین کالا و خدمات و خدمات</h2>
 
         <div className="flex w-full gap-5 flex-wrap justify-center overflow-auto">
           {

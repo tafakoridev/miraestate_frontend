@@ -25,7 +25,7 @@ export default function LoginLayout({
                 <Navbar SetOpen={SetOpen} open={open}/>
             </div>
             <div className="w-full h-[92%]">
-                <Main children={children} title={"مدیریت کالا ها"}/> 
+                <Main children={children} title={"مدیریت کالا و خدمات"}/> 
             </div>
             <div className="w-full bg-gray-200 h-[2%]">
                 <Footer />
