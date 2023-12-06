@@ -52,27 +52,27 @@ function AgentIn() {
   const [id, setId] = useState<string>("");
   const [is_open, setModal] = useState<boolean>(false);
   const [is_open_decline, setIsDecline] = useState<boolean>(false);
-
+  const fetchAgentInData = async () => {
+    Loading.pulse();
+    const token = GetToken();
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/agents/in`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data: AgentInResponse = await response.json();
+      setAgentInData(data);
+      Loading.remove();
+    } catch (error) {
+      console.error("Error fetching agent in data:", error);
+    }
+  };
   useEffect(() => {
-    const fetchAgentInData = async () => {
-      Loading.pulse();
-      const token = GetToken();
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/agents/in`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data: AgentInResponse = await response.json();
-        setAgentInData(data);
-        Loading.remove();
-      } catch (error) {
-        console.error("Error fetching agent in data:", error);
-      }
-    };
+
 
     fetchAgentInData();
   }, []); // Empty dependency array to ensure the effect runs only once on mount
@@ -95,6 +95,7 @@ function AgentIn() {
             setIsDecline(false);
             setType("");
             setId("");
+            fetchAgentInData();
           }}
           type={type}
           id={id}

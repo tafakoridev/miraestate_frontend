@@ -43,25 +43,27 @@ function Tenders() {
         console.log(purposeId);
         
     };
+    const fetchTenders = async () => {
+        Loading.pulse();
+        const token = GetToken();
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tenders/byuser/list`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await response.json();
+            setTenders(data.tenders);
+            Loading.remove();
+        } catch (error) {
+            console.error('Error fetching tenders:', error);
+        }
+    };
     useEffect(() => {
-        const fetchTenders = async () => {
-            Loading.pulse();
-            const token = GetToken();
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tenders/byuser/list`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                const data = await response.json();
-                setTenders(data.tenders);
-                Loading.remove();
-            } catch (error) {
-                console.error('Error fetching tenders:', error);
-            }
-        };
-
+     
         fetchTenders();
+       
+        
     }, []); // Empty dependency array to ensure the effect runs only once on mount
 
     const handleDeleteTender = async (id: number) => {
@@ -97,7 +99,9 @@ function Tenders() {
             <h1>لیست مناقصات من</h1>
             {IsAgentSelect && <AgentSelect onClose={() => {
                 setIsAgentSelect(false);
-                setSelectedTenderId(null)
+                setSelectedTenderId(null);
+                fetchTenders();
+
             }} type='tender' id={`${selectedTenderId}`}/>}
             <table className="table-auto border-collapse w-[1000px] text-center md:w-full">
                 <thead>

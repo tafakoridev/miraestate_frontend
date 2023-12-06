@@ -9,7 +9,13 @@ interface HomeProps {
 
 
 
-interface IUser {
+interface Information {
+    rate: number;
+    profile_photo_url: string;
+    is_active: string;
+  }
+  
+  interface IUser {
     created_at: string;
     gender: string | null;
     id: number;
@@ -21,7 +27,8 @@ interface IUser {
     updated_at: string;
     department_expertises: IAgentExpertise[];
     category_expertises: IAgentExpertise[];
-}
+    information: Information;
+  }
 
 interface Field {
     title: string;
@@ -70,8 +77,9 @@ const Agents: React.FC<HomeProps> = ({ users, choseAgent }) => {
                     ]}
 
                 >
+                    
                     {users.map((user: IUser, i) => (
-                        <AgentBox key={i} choseAgent={async(id: string) => choseAgent(id)} user={user}  photo={`/assets/ag-${i + 1}.jpg`}/>
+                        <AgentBox key={i} choseAgent={async(id: string) => choseAgent(id)} user={user}  photo={`${user.information.profile_photo_url}`}/>
                     ))}
                 </Slider>
                 <br />

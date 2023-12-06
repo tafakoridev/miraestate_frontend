@@ -1,3 +1,9 @@
+interface Information {
+    rate: number;
+    profile_photo_url: string;
+    is_active: string;
+}
+
 interface User {
     created_at: string;
     gender: string | null;
@@ -7,5 +13,7 @@ interface User {
     phonenumber: string;
     role: string;
     state: string;
+    city_id: string;
     updated_at: string;
+    information: Information;
 }

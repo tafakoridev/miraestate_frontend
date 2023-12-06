@@ -4,10 +4,11 @@ import Main  from "../components/dashboard/Main";
 import Footer from "../components/dashboard/Footer";
 import Navbar from "../components/dashboard/Nav";
 import Sidebar from "../components/dashboard/Sidebar";
-import { GetUser, IsLogin } from "../utils/Auth";
+import { GetUser, IsActiveAgent, IsAgent, IsLogin } from "../utils/Auth";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Loading, Notify } from "notiflix";
 
 function ContainerMain() {
     return (
@@ -18,15 +19,40 @@ function ContainerMain() {
 }
 
 const DashobardPage = () => {
-    const isLogin = IsLogin();
-    const user = GetUser();
     const [open, SetOpen] = useState(false);
     const router = useRouter();
-    useEffect(() => {
-        if(isLogin === false)
-            router.push('/login')
-        
-    }, [])
+
+    const fetchData = async () => {
+        try {
+          const isLogin = IsLogin();
+          const isAgent = await IsAgent();
+          
+          if (isAgent) {
+            const isActiveAgent = await IsActiveAgent();
+            console.log(isActiveAgent);
+            
+            if (!isActiveAgent) {
+                Loading.pulse();
+              Notify.init({
+                    width: '300px',
+                    position: 'left-bottom',
+                    });
+                Notify.failure("حساب کارشناسی شما هنوز فعال نشده است")
+            }
+          }
+          
+          if (!isLogin) {
+            router.push('/login');
+          }
+        } catch (error) {
+          // Handle errors here
+          console.error(error);
+        }
+      };
+      
+      useEffect(() => {
+        fetchData();
+      }, []);
     return (
        <div className="w-full h-full flex flex-row">
            <div className={`easy-animation h-full ${open ? 'md:w-1/6 w-full md:static fixed' : ' md:w-0 w-0 '}`}>

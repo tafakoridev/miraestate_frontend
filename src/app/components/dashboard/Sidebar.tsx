@@ -22,7 +22,7 @@ function Sidebar({ SetOpen, open }: any) {
     }, []);
 
     return (
-        <aside className={`relative bg-gradient-to-l from-blue-100 via-blue-50 to-blue-100  w-full h-full float-right shadow-xl border-l-2 border-gray-300`}>
+        <aside className={`overflow-y-auto relative bg-gradient-to-l from-blue-100 via-blue-50 to-blue-100  w-full h-full float-right shadow-xl border-l-2 border-gray-300`}>
             <div className="absolute left-0 top-0 w-full h-full z-10">
                 <button onClick={() => SetOpen(!open)} className={`absolute left-[10px] top-[10px] text-blue-900 menu w-[30px] h-[30px]`}></button>
                 <MiraInformation />
@@ -42,8 +42,14 @@ function Sidebar({ SetOpen, open }: any) {
                 <Item title={"مدیریت مزایده ها"} path={"/dashboard/auctions/list"}  icon={"/assets/icons8-auction-96.png"}/>
                 <Item child={true} title={"ایجاد مزایده"} path={"/dashboard/auctions/create"} icon={"/assets/icons8-auction-96-add.png"}/>
                 {
-                    isAgent && <Item title={"ارجاعات کارشناسی"} path={"/dashboard/agent"} icon={"/assets/icons8-broker-96.png"} />
+                    isAgent && <>
+                    <Item title={"ارجاعات کارشناسی"} path={"/dashboard/agent"} icon={"/assets/icons8-broker-96.png"} />
+                    <Item title={"دسته بندی های من"} path={"/dashboard/agentcategories"} icon={"/assets/icons8-opened-folder-96.png"} />
+                    <Item title={"دپارتمان های من"} path={"/dashboard/agentdepartments"} icon={"/assets/icons8-opened-folder-96.png"} />
+                    <Item title={"پروفایل من"} path={"/dashboard/profile"} icon={"/assets/icons8-admin-settings-male-96.png"} />
+                    </>
                 }
+                
 
                
                 <div onClick={() => {

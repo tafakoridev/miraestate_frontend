@@ -1,3 +1,13 @@
+interface IUser extends User {
+    city: City;
+  }
+  interface City {
+    // Define your city interface
+    id: number;
+    name: string;
+    province_id: string;
+  }
+
 function IsLogin(): boolean {
     const token = GetToken();
     return token ? true : false;
@@ -11,16 +21,20 @@ function GetToken(): string | boolean {
     else return false;
 }
 
-async function GetUser(): Promise<User | undefined> {
+async function GetUser(): Promise<IUser | undefined> {
     if (IsLogin()) {
         const token = GetToken();
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
             },
         });
+        if (res.status === 401) {
+            localStorage.removeItem('api_token')
+        }
         const result = await res.json();
         return result;
     }
@@ -48,6 +62,15 @@ async function IsAgent(): Promise<boolean> {
     }
     else return false;
 }
+
+async function IsActiveAgent(): Promise<boolean> {
+    if (IsLogin()) {
+        const user = await GetUser();
+        user?.role == 'agent';
+        return user?.information?.is_active === 'active';
+    }
+    else return false;
+}
 // async function checkRole(): Promise<User | undefined> {
 //     if (IsLogin()) {
 //         const token = GetToken();
@@ -63,4 +86,4 @@ async function IsAgent(): Promise<boolean> {
 //     }
 // }
 
-export { IsLogin, GetUser, GetToken, checkRole, IsAdmin, IsAgent }
+export { IsLogin, GetUser, GetToken, checkRole, IsAdmin, IsAgent, IsActiveAgent }

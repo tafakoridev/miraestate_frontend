@@ -4,7 +4,7 @@ import Image from "next/image";
 interface AgentBoxProps {
     user: IUser;
     photo: string;
-    choseAgent:any;
+    choseAgent: any;
 }
 
 interface IUser {
@@ -36,7 +36,7 @@ interface IAgentExpertise {
     field: Field;
 }
 
-const AgentBox: React.FC<AgentBoxProps> = ({ user, photo,choseAgent }) => {
+const AgentBox: React.FC<AgentBoxProps> = ({ user, photo, choseAgent }) => {
     return (
         <div key={user.id} className="max-w-sm mx-4 my-4 bg-white shadow-md rounded-md overflow-hidden aspect-square flex justify-center items-center">
             {/* Uncomment the following line when you have the user's photo */}
@@ -44,8 +44,15 @@ const AgentBox: React.FC<AgentBoxProps> = ({ user, photo,choseAgent }) => {
                 <div className="w-full">
                     <h3 className="text-md text-center font-semibold">{user.name}</h3>
                 </div>
-                <div className="w-full h-1/4">
-                    <Image src={photo} alt={`${user.name}`} width={300} height={300} className="h-48 md:h-36 rounded-md w-full object-cover object-top" />
+                <div className="w-full h-1/4 text-center">
+                    {photo
+                        && <Image
+                            loader={() => `${process.env.NEXT_PUBLIC_BACKEND_URL}${photo}`}
+                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${photo}`}
+                            alt={`${user.name}`} width={300} height={300}
+                            className="h-48 w-48 md:h-36 md:w-36 aspect-square object-cover object-top mx-auto rounded-full"
+                        />
+                    }
                 </div>
                 <div className="w-full text-right">
                     <h3 className="text-sm">متخصص در</h3>
@@ -56,7 +63,7 @@ const AgentBox: React.FC<AgentBoxProps> = ({ user, photo,choseAgent }) => {
                 </div>
                 <div className="w-full flex justify-center">
                     <button
-                        onClick={async() => {
+                        onClick={async () => {
                             choseAgent(user.id)
                         }}
                         className="my-2 float-left text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-1.5 text-center"

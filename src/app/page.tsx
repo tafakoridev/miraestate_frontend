@@ -18,7 +18,11 @@ interface Category {
   title: string;
 }
 
-
+interface Information {
+  rate: number;
+  profile_photo_url: string;
+  is_active: string;
+}
 
 interface IUser {
   created_at: string;
@@ -32,6 +36,7 @@ interface IUser {
   updated_at: string;
   department_expertises: IAgentExpertise[];
   category_expertises: IAgentExpertise[];
+  information: Information;
 }
 
 interface Field {
@@ -121,6 +126,7 @@ const Home: React.FC = () => {
         const data = await response.json();
 
         setUsers(data);
+        
         Loading.remove();
       } catch (error) {
         console.error('Error fetching users:', error);
@@ -274,6 +280,7 @@ const Home: React.FC = () => {
 
       {/* Bottom Gray Bar */}
       <div className="w-full md:h-10 h-15 bg-gray-100 flex md:flex-row flex-col gap-2 py-2 md:gap-0 justify-between items-center px-10 text-center">
+      <div className="w-full md:h-10 h-15 bg-gray-100 flex md:flex-row flex-col gap-2 py-2 md:gap-0 justify-between items-center px-10 text-center">
         <div className="flex justify-start items-center gap-5">
           <a href="" className='text-gray-500 text-sm'>
             راهنمای سایت
@@ -301,6 +308,7 @@ const Home: React.FC = () => {
           </a>
         </div>
       </div>
+    </div>
     </div>
   );
 };
