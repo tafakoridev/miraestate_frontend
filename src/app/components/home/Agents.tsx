@@ -79,7 +79,7 @@ const Agents: React.FC<HomeProps> = ({ users, choseAgent }) => {
                 >
                     
                     {users.map((user: IUser, i) => (
-                        <AgentBox key={i} choseAgent={async(id: string) => choseAgent(id)} user={user}  photo={`${user.information.profile_photo_url}`}/>
+                        <AgentBox key={i} choseAgent={async(id: string) => choseAgent(id)} user={user}  photo={user.information ? `${user.information.profile_photo_url}` : ""}/>
                     ))}
                 </Slider>
                 <br />

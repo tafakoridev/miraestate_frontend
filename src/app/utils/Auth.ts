@@ -1,5 +1,10 @@
+import Education from "../interfaces/Education";
+import Employee from "../interfaces/Employee";
+
 interface IUser extends User {
     city: City;
+    educations: Education[];
+    employees: Employee[];
   }
   interface City {
     // Define your city interface

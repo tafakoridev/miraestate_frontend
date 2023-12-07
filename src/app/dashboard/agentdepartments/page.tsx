@@ -39,6 +39,7 @@ function AgentDepartments() {
       }
 
       const result = await res.json();
+      
       setDepartments(result.department_expertises);
       setDataLoaded(true);
       Loading.remove();
@@ -111,7 +112,7 @@ function AgentDepartments() {
             {departments.map((department, index) => (
               <tr key={index}>
                 <td className="border border-slate-300 w-1/12">{index + 1}</td>
-                <td className="border border-slate-300 w-1/4">{department.field.title}</td>
+                <td className="border border-slate-300 w-1/4">{department.field?.title}</td>
                 <td className="border border-slate-300 w-1/4">
                   <input
                     type="number"

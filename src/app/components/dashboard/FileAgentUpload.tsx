@@ -1,5 +1,6 @@
 import { GetToken } from '@/app/utils/Auth';
 import Image from 'next/image';
+import { Notify } from 'notiflix';
 import React, { useState } from 'react';
 
 interface FileUploadProps {
@@ -9,7 +10,6 @@ interface FileUploadProps {
 
 const FileAgentUpload: React.FC<FileUploadProps> = ({ onFileChange, image }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  console.log(image);
   
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +35,8 @@ const FileAgentUpload: React.FC<FileUploadProps> = ({ onFileChange, image }) => 
           if (response.ok) {
             onFileChange(file);
             setSelectedFile(file);
+  
+            Notify.success("تصویر با موفقیت بارگذاری شد")
           } else {
             console.error('خطا در بارگذاری عکس:', response.statusText);
           }
