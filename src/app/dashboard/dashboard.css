@@ -25,3 +25,10 @@
     overflow: hidden;
     transition: width 0.3s ease;
   }
+
+  .beller {
+    background: url("../../../public/assets/icons8-bell-64.png");
+    background-size: cover;
+    width: 32px;
+    height: 32px;
+  }

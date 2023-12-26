@@ -35,7 +35,7 @@ function Sidebar({ SetOpen, open }: any) {
                     </>
                 }
                 <Item title={"مدیریت کالا و خدمات"} path={"/dashboard/commodities/index"}  icon={"/assets/icons8-commodity-96.png"}/>
-                <Item child={true} title={"ایجاد کالا"} path={"/dashboard/commodities/create"} icon={"/assets/icons8-add-file-96.png"}/>
+                <Item child={true} title={"ایجاد کالا و خدمات"} path={"/dashboard/commodities/create"} icon={"/assets/icons8-add-file-96.png"}/>
 
                 <Item title={"مدیریت مناقصه ها"} path={"/dashboard/tenders/list"}  icon={"/assets/icons8-currency-96.png"}/>
                 <Item child={true} title={"ایجاد مناقصه"} path={"/dashboard/tenders/create"} icon={"/assets/icons8-calendar-plus-96.png"}/>

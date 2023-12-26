@@ -1,11 +1,11 @@
 // AgentShow.tsx
-import { useState, useEffect } from 'react';
-import { Loading, Notify } from 'notiflix';
-import { GetToken } from '@/app/utils/Auth';
-import Image from 'next/image';
-import Education from '@/app/interfaces/Education';
-import Employee from '@/app/interfaces/Employee';
-import moment from 'moment-jalaali';
+import { useState, useEffect } from "react";
+import { Loading, Notify } from "notiflix";
+import { GetToken } from "@/app/utils/Auth";
+import Image from "next/image";
+import Education from "@/app/interfaces/Education";
+import Employee from "@/app/interfaces/Employee";
+import moment from "moment-jalaali";
 
 interface AgentShowProps {
   onClose: () => void;
@@ -18,12 +18,23 @@ interface Information {
   is_active: string;
 }
 
+interface Agentable {
+  title: string;
+  created_at: Date;
+}
+
+interface AgentDesk {
+  agentable: Agentable;
+  agentable_type: string;
+}
+
 interface IUser {
   created_at: string;
   gender: string | null;
   information: Information;
   education: Education[];
   employees: Employee[];
+  agent_desks: AgentDesk[];
   id: number;
   name: string | null;
   national_code: string | null;
@@ -34,7 +45,6 @@ interface IUser {
   department_expertises: IAgentExpertise[];
   category_expertises: IAgentExpertise[];
   description: string;
-
 }
 
 interface Field {
@@ -52,36 +62,37 @@ interface IAgentExpertise {
   field: Field;
 }
 
-
 // Import necessary dependencies and interfaces
 
 const AgentShow: React.FC<AgentShowProps> = ({ onClose, agentId }) => {
   const [agentData, setAgentData] = useState<IUser | null>(null);
   const educationLevelMapping = {
-    under_diploma: 'زیردیپلم',
-    diploma: 'دیپلم',
-    over_diploma: 'فوق دیپلم',
-    branch: 'لیسانس',
-    master: 'فوق لیسانس',
-    phd: 'دکتری',
+    under_diploma: "زیردیپلم",
+    diploma: "دیپلم",
+    over_diploma: "فوق دیپلم",
+    branch: "لیسانس",
+    master: "فوق لیسانس",
+    phd: "دکتری",
   } as const;
   useEffect(() => {
     const fetchAgentData = async () => {
       Loading.pulse();
       const token = GetToken();
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${agentId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/${agentId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         const data = await response.json();
-        console.log(data);
-        
+
         setAgentData(data);
         Loading.remove();
       } catch (error) {
-        console.error('Error fetching agent data:', error);
+        console.error("Error fetching agent data:", error);
       }
     };
 
@@ -90,16 +101,44 @@ const AgentShow: React.FC<AgentShowProps> = ({ onClose, agentId }) => {
 
   const handleCall = () => {
     if (agentData?.phonenumber) {
-      Notify.success('در حال تماس...');
-      location.href = 'tel://' + agentData?.phonenumber;
+      Notify.success("در حال تماس...");
+      location.href = "tel://" + agentData?.phonenumber;
     } else {
-      Notify.warning('شماره همراه در دسترس نیست');
+      Notify.warning("شماره همراه در دسترس نیست");
     }
   };
 
+  function getModelTypeDescription(modelType: string) {
+    switch (modelType) {
+      case "App\\Models\\Tender":
+        return "مناقصه ";
+      case "App\\Models\\Auction":
+        return "مزایده ";
+      case "App\\Models\\Commodity":
+        return "کالا و خدمات ";
+      default:
+        return "نوع مدل نامعتبر (Invalid Model Type)";
+    }
+  }
+
+  function getModelTypeColor(modelType: string) {
+    switch (modelType) {
+      case "App\\Models\\Tender":
+        return "bg-green-500";
+      case "App\\Models\\Auction":
+        return "bg-blue-500 ";
+      case "App\\Models\\Commodity":
+        return "bg-purple-500";
+      default:
+        return "نوع مدل نامعتبر (Invalid Model Type)";
+    }
+  }
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-auto">
-      <div className="bg-white p-8 rounded-lg md:w-1/3 w-full  overflow-x-hidden relative">
+    <div
+      className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="bg-white p-8 rounded-lg md:w-1/3 w-full  overflow-x-hidden relative h-1/2">
         {agentData ? (
           <>
             <h2 className="text-2xl font-bold mb-4">{agentData.name}</h2>
@@ -107,8 +146,10 @@ const AgentShow: React.FC<AgentShowProps> = ({ onClose, agentId }) => {
               {/* Display agent's image */}
               <div className="mb-4">
                 <Image
-                  loader={() => `${process.env.NEXT_PUBLIC_BACKEND_URL}${agentData.information.profile_photo_url}`}
-                  src={ `${process.env.NEXT_PUBLIC_BACKEND_URL}${agentData.information.profile_photo_url}`}
+                  loader={() =>
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}${agentData.information.profile_photo_url}`
+                  }
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${agentData.information.profile_photo_url}`}
                   alt={agentData.name ?? "photo"}
                   width={100}
                   height={100}
@@ -117,11 +158,15 @@ const AgentShow: React.FC<AgentShowProps> = ({ onClose, agentId }) => {
               </div>
 
               {/* Display agent's information */}
-              <p className="text-gray-600 my-2 whitespace-break-spaces" dir='rtl'>
+              {/* <p className="text-gray-600 my-2 whitespace-break-spaces" dir='rtl'>
                 <strong>شماره تماس: </strong>{agentData.phonenumber}
-              </p>
-              <p className="text-gray-600 my-2 whitespace-break-spaces" dir='rtl'>
-                <strong>جنسیت: </strong>{agentData.gender === 'male' ? 'آقا' : 'خانم'}
+              </p> */}
+              <p
+                className="text-gray-600 my-2 whitespace-break-spaces"
+                dir="rtl"
+              >
+                <strong>جنسیت: </strong>
+                {agentData.gender === "male" ? "آقا" : "خانم"}
               </p>
               {/* Add more information as needed */}
 
@@ -129,22 +174,65 @@ const AgentShow: React.FC<AgentShowProps> = ({ onClose, agentId }) => {
               <h3 className="text-lg font-medium mb-2">تحصیلات</h3>
               <ul className="list-disc pl-6">
                 {agentData?.education?.map((edu) => (
-                  <li key={edu.id} className="text-gray-600 my-2" dir='rtl'>
-                    - 
-                    
-                    {`${educationLevelMapping[edu.educational_level as keyof typeof educationLevelMapping]} در ${edu.field_of_study} - ${edu.educational_institution} (${moment(edu.from).format('jYYYY/jM/jD')} تا ${moment(edu.to).format('jYYYY/jM/jD') ?? 'تاکنون'})`}
+                  <li key={edu.id} className="text-gray-600 my-2" dir="rtl">
+                    -
+                    {`${
+                      educationLevelMapping[
+                        edu.educational_level as keyof typeof educationLevelMapping
+                      ]
+                    } در ${edu.field_of_study} - ${
+                      edu.educational_institution
+                    } (${moment(edu.from).format("jYYYY/jM/jD")} تا ${
+                      moment(edu.to).format("jYYYY/jM/jD") ?? "تاکنون"
+                    })`}
                   </li>
                 ))}
               </ul>
-
 
               {/* Display agent's employees */}
               <h3 className="text-lg font-medium mb-2">شغل‌ها</h3>
               <ul className="list-disc pl-6">
                 {agentData.employees.map((employee) => (
-                  <li key={employee.id} className="text-gray-600 my-2" dir='rtl'>
-                      - 
-                    {`${employee.job_title} در ${employee.company_name} (${moment(employee.from).format('jYYYY/jM/jD')} تا ${moment(employee.to).format('jYYYY/jM/jD') ?? 'تاکنون'})`}
+                  <li
+                    key={employee.id}
+                    className="text-gray-600 my-2"
+                    dir="rtl"
+                  >
+                    -
+                    {`${employee.job_title} در ${
+                      employee.company_name
+                    } (${moment(employee.from).format("jYYYY/jM/jD")} تا ${
+                      moment(employee.to).format("jYYYY/jM/jD") ?? "تاکنون"
+                    })`}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Display agent's employees */}
+              <h3 className="text-lg font-medium mb-2">
+                سوابق کارشناسی در سایت
+              </h3>
+              <ul className="list-disc pl-6">
+                {agentData.agent_desks.map((desk, i) => (
+                  <li
+                    key={i}
+                    className="text-gray-600 my-2 border-b-2 pb-2 flex justify-between"
+                    dir="rtl"
+                  >
+                    <span
+                      className={`inline-block  text-white px-2 py-1 rounded-full ${getModelTypeColor(
+                        desk.agentable_type
+                      )}`}
+                    >
+                      {getModelTypeDescription(desk.agentable_type)}
+                    </span>
+                    &nbsp; &nbsp;
+                    {`${desk.agentable.title.slice(0, 50)}...`}
+                    <span
+                      className={`text-xs  text-white px-2 py-1 rounded-full bg-gray-400 flex justify-center items-center`}
+                    >
+                      {moment(desk.agentable.created_at).format("jYYYY/jM/jD")}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -158,12 +246,12 @@ const AgentShow: React.FC<AgentShowProps> = ({ onClose, agentId }) => {
               >
                 بستن
               </button>
-              <button
+              {/* <button
                 className="my-2 float-left text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
                 onClick={handleCall}
               >
                 تماس
-              </button>
+              </button> */}
             </div>
           </>
         ) : (

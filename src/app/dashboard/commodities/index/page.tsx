@@ -205,8 +205,8 @@ function Commodities() {
                                 <td className="border border-slate-300 w-1/12">{commodity.price} تومان</td>
                                 <td className="border border-slate-300 w-1/12">{commodity.city?.name}</td>
                                 <td className="border border-slate-300 w-1/12">{commodity.category?.title}</td>
-                                <td className="border border-slate-300 flex justify-center w-1/6">
-                                    <Image loader={() => `${commodity.picture}`} src={`${commodity.picture}`} width={200} height={150} alt={commodity.title} className='m-2' />
+                                <td className="border border-slate-300 flex justify-center">
+                                    <Image loader={() => `${process.env.NEXT_PUBLIC_BACKEND_URL}${commodity.picture}`} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${commodity.picture}`} width={200} height={150} alt={commodity.title} className='m-2 ' />
                                 </td>
                                 <td className="border border-slate-300 w-1/12">
                                     <button className=" text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => router.push(`/dashboard/commodities/edit?commodityId=${commodity.id}`)}>

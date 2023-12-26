@@ -13,6 +13,13 @@ interface City {
   name: string;
 }
 
+interface User {
+  id: number;
+  name: string;
+  phonenumber: string;
+  // Add other properties if necessary
+}
+
 interface Commodity {
   id: number;
   category_id: number;
@@ -20,6 +27,7 @@ interface Commodity {
   description: string;
   price: number;
   city_id: number;
+  agent_id?: number;
   picture: any;
 }
 
@@ -30,6 +38,7 @@ interface CommodityEditProps {
 const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [cities, setCities] = useState<City[]>([]);
+  const [agents, setAgents] = useState<User[]>([]);
   const [formData, setFormData] = useState<Commodity>({
     id: 0,
     category_id: 0,
@@ -37,6 +46,7 @@ const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
     description: '',
     price: 0,
     city_id: 0,
+    agent_id: undefined,
     picture: '',
   });
 
@@ -45,34 +55,36 @@ const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
       Loading.pulse();
       const token = GetToken();
       const { commodityId } = searchParams;
-      
+
       try {
-        // Fetch commodity details from /api/commodities/:id endpoint
-        const commodityResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/${commodityId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const commodityData = await commodityResponse.json();
+        // Fetch commodity details, categories, cities, and agents concurrently
+        const [commodityResponse, categoriesResponse, citiesResponse, agentsResponse] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/${commodityId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cities`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/agents/list/${formData.category_id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        const [commodityData, categoriesData, citiesData, agentsData] = await Promise.all([
+          commodityResponse.json(),
+          categoriesResponse.json(),
+          citiesResponse.json(),
+          agentsResponse.json(),
+        ]);
+        
+        if(formData.category_id === commodityData.commodity.category_id || !formData.category_id)
         setFormData(commodityData.commodity);
-
-        // Fetch categories from /api/categories endpoint
-        const categoriesResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const categoriesData = await categoriesResponse.json();
         setCategories(categoriesData.categories);
-
-        // Fetch cities from /api/cities endpoint
-        const citiesResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cities`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const citiesData = await citiesResponse.json();
         setCities(citiesData);
+        setAgents(agentsData);
 
         Loading.remove();
       } catch (error) {
@@ -81,10 +93,11 @@ const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
     };
 
     fetchCommodityAndData();
-  }, [searchParams]);
+  }, [searchParams, formData.category_id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
@@ -108,8 +121,10 @@ const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
       formObject.append('description', formData.description);
       formObject.append('price', formData.price.toString());
       formObject.append('city_id', formData.city_id.toString());
+      if (formData.agent_id !== undefined) {
+        formObject.append('agent_id', formData.agent_id.toString());
+      }
 
-      
       if (formData.picture && formData.picture instanceof File) {
         formObject.append('picture', formData.picture);
       }
@@ -183,6 +198,22 @@ const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
               </option>
             ))}
           </select>
+
+          {/* Agent select box */}
+          <select
+            name="agent_id"
+            value={formData.agent_id !== undefined ? formData.agent_id : ''}
+            onChange={handleInputChange}
+            className="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          >
+            <option value="">انتخاب کارشناس</option>
+            {agents.map((agent: User) => (
+              <option key={agent.id} value={agent.id}>
+                {agent.name} - {agent.phonenumber}
+              </option>
+            ))}
+          </select>
+
           {/* Price input field */}
           <input
             type="number"
@@ -204,6 +235,7 @@ const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
           className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:outline-none"
           placeholder="توضیحات کالا را اینجا وارد کنید..."
         />
+
         {/* Submit button */}
         <button
           className="my-2 float-left text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
@@ -211,6 +243,7 @@ const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
         >
           ویرایش کالا
         </button>
+
         {/* Picture input field */}
         <input
           type="file"
@@ -219,6 +252,7 @@ const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
           className="my-2"
           accept="image/*"
         />
+
         {formData.picture && (
           <img
             src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${formData.picture}`}
