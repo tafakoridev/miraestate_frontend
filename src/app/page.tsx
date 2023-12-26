@@ -129,8 +129,8 @@ const Home: React.FC = () => {
         console.error("Error fetching users:", error);
       }
     };
-    if (selectedCity) fetchUsers();
-  }, [selectedCity]);
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
     const checkIsLoggedIn = async () => {
