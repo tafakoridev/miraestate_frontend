@@ -118,7 +118,7 @@ const Home: React.FC = () => {
     const fetchUsers = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/agents/${selectedCityId}/list`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/agents/0/list`
         );
         const data = await response.json();
 
