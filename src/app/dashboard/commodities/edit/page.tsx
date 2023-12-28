@@ -35,7 +35,10 @@ interface CommodityEditProps {
   searchParams: { commodityId: number };
 }
 
-const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
+const CommodityEdit = (props: any) => {
+
+  console.log(props.query);
+  console.log(props.searchParams.commodityId);
   const [categories, setCategories] = useState<Category[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [agents, setAgents] = useState<User[]>([]);
@@ -53,8 +56,10 @@ const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
   useEffect(() => {
     const fetchCommodityAndData = async () => {
       Loading.pulse();
+      
       const token = GetToken();
-      const { commodityId } = searchParams;
+      const { commodityId } = props.searchParams;
+console.log(props);
 
       try {
         // Fetch commodity details, categories, cities, and agents concurrently
@@ -93,7 +98,7 @@ const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
     };
 
     fetchCommodityAndData();
-  }, [searchParams, formData.category_id]);
+  }, [props.searchParams, formData.category_id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -130,7 +135,7 @@ const CommodityEdit: React.FC<CommodityEditProps> = ({ searchParams }) => {
       }
 
       // Update existing commodity with the specified data
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/update/${searchParams.commodityId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/update/${props.searchParams.commodityId}`, {
         method: 'post',
         headers: myHeaders,
         body: formObject,
