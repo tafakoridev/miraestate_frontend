@@ -45,6 +45,25 @@ async function GetUser(): Promise<IUser | undefined> {
     }
 }
 
+async function GetUserById(id: string): Promise<IUser | undefined> {
+    if (IsLogin()) {
+        const token = GetToken();
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        if (res.status === 401) {
+            localStorage.removeItem('api_token')
+        }
+        const result = await res.json();
+        return result;
+    }
+}
+
 async function checkRole(): Promise<any> {
     if (IsLogin()) {
         const user = await GetUser();
@@ -91,4 +110,4 @@ async function IsActiveAgent(): Promise<boolean> {
 //     }
 // }
 
-export { IsLogin, GetUser, GetToken, checkRole, IsAdmin, IsAgent, IsActiveAgent }
+export { IsLogin, GetUser, GetToken, checkRole, IsAdmin, IsAgent, IsActiveAgent, GetUserById }

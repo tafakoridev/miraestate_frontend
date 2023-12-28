@@ -104,11 +104,13 @@ const Profile: React.FC = () => {
 
         Notify.success("رکورد تحصیلات جدید با موفقیت افزوده شد");
       } else {
+        Notify.failure("تاریخ شروع و پایان را انتخاب کنید")
         console.error('Failed to add education record:', response.statusText);
       }
 
       Loading.remove();
     } catch (error) {
+      Notify.failure("تاریخ شروع و پایان را انتخاب کنید")
       console.error('Error adding education record:', error);
       Loading.remove();
     }
@@ -128,6 +130,8 @@ const Profile: React.FC = () => {
         delete updatedUserBefore.city;
         delete updatedUserBefore.created_at;
         delete updatedUserBefore.updated_at;
+        delete updatedUserBefore.educations;
+        delete updatedUserBefore.employees;
       }
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/update/${user?.id}`, {
         method: 'PUT',
@@ -314,11 +318,13 @@ const Profile: React.FC = () => {
 
         Notify.success("رکورد شغلی جدید با موفقیت افزوده شد");
       } else {
+        Notify.failure("تاریخ شروع و پایان را انتخاب کنید")
         console.error('Failed to add employee record:', response.statusText);
       }
 
       Loading.remove();
     } catch (error) {
+      Notify.failure("تاریخ شروع و پایان را انتخاب کنید")
       console.error('Error adding employee record:', error);
       Loading.remove();
     }

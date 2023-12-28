@@ -22,7 +22,7 @@ const TenderPurposeList: React.FC<TenderPurposeListProps> = ({ purposes, onClose
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-auto">
       <div className="bg-white p-8 rounded-lg md:w-1/2 w-full overflow-hidden">
-        <h2 className="text-2xl font-bold mb-4">لیست اهداف</h2>
+        <h2 className="text-2xl font-bold mb-4">لیست پیشنهادات</h2>
         <table className="table-auto border-collapse w-full text-center">
           <thead>
             <tr>

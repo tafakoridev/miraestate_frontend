@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Loading, Notify } from 'notiflix';
 import { GetToken, GetUser } from '@/app/utils/Auth';
-
+import DatePicker from "persian-react-datepicker";
+import moment from "moment-jalaali";
 interface Department {
     id: number;
     title: string;
@@ -21,6 +22,8 @@ interface FormData {
     title: string;
     description: string;
     user_id: string;
+    start: string;
+    end: string;
 }
 
 const AuctionCreate: React.FC = () => {
@@ -32,6 +35,8 @@ const AuctionCreate: React.FC = () => {
         title: '',
         description: '',
         user_id: '',
+        start: moment().format("jYYYY-jMM-jDD"),
+        end: moment().format("jYYYY-jMM-jDD"),
     });
 
     useEffect(() => {
@@ -77,6 +82,10 @@ const AuctionCreate: React.FC = () => {
         fetchAgents();
     }, []); // Empty dependency array to ensure the effect runs only once on mount
 
+    const handleInputDateChange = (name: any, value: any) => {
+        setFormData((prevData) => ({ ...prevData, [name]: value }));
+      };
+    
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -160,6 +169,45 @@ const AuctionCreate: React.FC = () => {
                             </option>
                         ))}
                     </select>
+                    <div className="mb-4 md:w-1/3 w-full px-3">
+            <label
+              htmlFor="endDate"
+              className="block text-sm font-medium text-gray-600"
+            >
+              تاریخ شروع
+            </label>
+            <DatePicker
+              className="mt-1 p-2 w-full border rounded-md"
+              onChange={(value: any) =>
+                handleInputDateChange(
+                  "start",
+                  moment(value, "jYYYY/jM/jD HH:mm").format("YYYY-M-D")
+                )
+              }
+              value={formData.start}
+              dateRenge={{ end: "1420", start: "1371" }}
+            />
+          </div>
+
+          <div className="mb-4 md:w-1/3 w-full px-3">
+            <label
+              htmlFor="endDate"
+              className="block text-sm font-medium text-gray-600"
+            >
+              تاریخ پایان
+            </label>
+            <DatePicker
+              className="mt-1 p-2 w-full border rounded-md"
+              onChange={(value: any) =>
+                handleInputDateChange(
+                  "end",
+                  moment(value, "jYYYY/jM/jD HH:mm").format("YYYY-M-D")
+                )
+              }
+              value={formData.end}
+              dateRenge={{ end: "1420", start: "1371" }}
+            />
+          </div>
                 </div>
                 <div>
                     <label>
