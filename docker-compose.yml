@@ -1,14 +1,14 @@
-version: '3.8'
+version: '3'
 
 services:
   nextjs-app:
+    # Build the image using the Dockerfile in the current directory
     build:
       context: .
       dockerfile: Dockerfile
+    # Map port 3000 on the host to port 3000 on the container
     ports:
-      - "3000:3000"
+      - "80:3000"
+    # Mount the volume from /root/miraestate_frontend on the host to /usr/src/app on the container
     volumes:
-      - ".:/app"
-    environment:
-      - NODE_ENV=production
-    command: ["npm", "start"]
+      - /root/miraestate_frontend:/usr/src/app
