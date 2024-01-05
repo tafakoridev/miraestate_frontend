@@ -282,7 +282,7 @@ function Agents() {
                                         onBlur={handleSaveRate}
                                     />
                                 ) : (
-                                    <>{agent.information.rate} <span className="text-gray-400">از 100</span></>
+                                    <>{agent.information?.rate ?? 0} <span className="text-gray-400">از 100</span></>
                                 )}
                                
                             </td>
