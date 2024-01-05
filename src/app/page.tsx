@@ -9,11 +9,27 @@ import { Loading } from "notiflix";
 import Kala from "./components/home/kala";
 import LocationSelector from "./components/home/LocationSelector";
 import Commodity from "./components/home/Commodity";
-import Agents from "./components/home/Agents";
 import AgentShow from "./components/home/AgentShow";
+import SidebarDivar from "./components/home/SidebarDivar";
+import AuctionShow from "./components/home/AuctionShow";
+import TenderShow from "./components/home/TenderShow";
 interface Category {
   id: number;
   title: string;
+}
+
+enum StateType {
+  Commodity = "commodity",
+  Tender = "tender",
+  Auction = "auction",
+}
+
+interface State {
+  selectedOption: StateType | null;
+}
+
+interface SideBarProps {
+  setOptions: Function;
 }
 
 interface Information {
@@ -64,11 +80,18 @@ const Home: React.FC = () => {
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [user, setUser] = useState<User | undefined>(undefined);
   const [agent_id, setAgentId] = useState<string>("");
+  const [category_id, setCategoryId] = useState<number | null>(0);
+  const [type, setType] = useState<string | null>("");
+  const router = useRouter();
+
+  useEffect(() => {
+    if (type !== "" || category_id !== 0) fetchCommodities(type, category_id);
+  }, [category_id, type]);
 
   const handleSearch = async () => {
     if (searchText.trim() === "") {
       // If the input is empty, fetch all commodities
-      await fetchCommodities();
+      await fetchCommodities(type, category_id);
     } else {
       // Perform the filtering based on the entered text
       const filteredCommodities = commodities.filter((commodity) =>
@@ -78,19 +101,25 @@ const Home: React.FC = () => {
     }
   };
 
-  const fetchCommodities = async () => {
+  const fetchCommodities = async (
+    type: string | null,
+    categoryId: number | null
+  ) => {
     Loading.pulse();
+
     const token = GetToken();
     let city_id = await localStorage.getItem("city_id");
+    let url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/bycity/list/${city_id}`;
+    if (type)
+      url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/bycity/list/${city_id}/${type}`;
+    if (categoryId)
+      url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/bycity/list/${city_id}/${type}/${categoryId}`;
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/bycity/list/${city_id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
 
       setCommodities(data.commodities);
@@ -99,6 +128,11 @@ const Home: React.FC = () => {
       console.error("Error fetching categories:", error);
     }
   };
+
+  function setOptions(type: State, id: number) {
+    setType(type.selectedOption);
+    setCategoryId(id);
+  }
 
   async function setCityFromStorage() {
     let city = localStorage.getItem("city");
@@ -109,7 +143,7 @@ const Home: React.FC = () => {
       setSelectedCityId(selectedCity.id);
     }
 
-    fetchCommodities();
+    fetchCommodities(type, category_id);
   }
 
   useEffect(() => {
@@ -167,14 +201,32 @@ const Home: React.FC = () => {
     }
     fetchCategories();
   }, []);
-  const router = useRouter();
+
   return (
     <div className="flex flex-col min-h-screen h-screen bg-gray-200 overflow-auto overflow-x-hidden">
       {agent_id && (
         <AgentShow agentId={agent_id} onClose={() => setAgentId("")} />
       )}
-      {commodity_id && (
+      {commodity_id && (type === "commodity" || !type) && (
         <Commodity
+          id={commodity_id}
+          onClose={() => {
+            setCommodity_id("");
+          }}
+          key={1}
+        />
+      )}
+      {commodity_id && type === "auction" && (
+        <AuctionShow
+          id={commodity_id}
+          onClose={() => {
+            setCommodity_id("");
+          }}
+          key={1}
+        />
+      )}
+      {commodity_id && type === "tender" && (
+        <TenderShow
           id={commodity_id}
           onClose={() => {
             setCommodity_id("");
@@ -196,10 +248,10 @@ const Home: React.FC = () => {
           {isLogin ? (
             <>
               <button className="bg-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs">
-                {user?.name ?? "نام شما"}
+                {user?.name ?? "کاربر"}
               </button>
               <button
-                className="bg-white justify-self-start float-left w-[60px] h-[20px] rounded-md border border-gray-300 shadow-sm text-xs mx-1"
+                className="bg-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs mx-1"
                 onClick={() => {
                   localStorage.removeItem("api_token");
                   router.push("/login");
@@ -233,11 +285,11 @@ const Home: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex flex-col w-full ">
+        <div className="flex flex-col w-full pb-4">
           <div className="flex w-full justify-center md:items-center flex-col md:flex-row">
             <div className="flex md:w-1/3 w-full md:justify-center items-center flex-col md:flex-row gap-5 md:gap-0">
               {/* Logo Image */}
-              <div className="w-2/6 mr-5">
+              <div className="w-2/6 ml-auto ">
                 <Image
                   onClick={() => router.push("/")}
                   src="/assets/mira_logo.png"
@@ -248,7 +300,7 @@ const Home: React.FC = () => {
                 />
               </div>
 
-              <div className="relative md:w-4/6 h-full">
+              <div className="relative md:w-4/6 h-full ml-auto">
                 <input
                   type="text"
                   placeholder="نام کالا را وارد کنید"
@@ -275,10 +327,10 @@ const Home: React.FC = () => {
               {isLogin ? (
                 <>
                   <button className="bg-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs">
-                    {user?.name ?? "نام شما"}
+                    {user?.name ?? "کاربر"}
                   </button>
                   <button
-                    className="bg-white justify-self-start float-left w-[60px] h-[20px] rounded-md border border-gray-300 shadow-sm text-xs mx-1"
+                    className="bg-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs mx-1"
                     onClick={() => {
                       localStorage.removeItem("api_token");
                       router.push("/login");
@@ -297,7 +349,7 @@ const Home: React.FC = () => {
               )}
             </div>
           </div>
-
+          {/* 
           <div className="flex px-5">
             <ul className="list-none mt-4">
               {categories.map((category: Category, index) => (
@@ -306,24 +358,17 @@ const Home: React.FC = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col items-center gap-10 justify-start pt-24">
-        <h2 className="text-lg">کارشناسان مورد تایید</h2>
-        {users && (
-          <Agents
-            users={users}
-            choseAgent={async (id: string) => setAgentId(id)}
-          />
-        )}
-      </div>
       {/* Main Content */}
-      <main className="flex-grow flex flex-col items-center gap-10 justify-start p-24">
-        <h2 className="text-lg">جدیدترین کالا و خدمات و خدمات</h2>
-
-        <div className="flex w-full gap-5 flex-wrap justify-center overflow-auto">
+      <main className="flex-grow flex items-start gap-10 justify-start p-24 md:flex-nowrap flex-wrap">
+        {/* <h2 className="text-lg">جدیدترین ها</h2> */}
+        <div className="nicescroll bg-white md:w-1/6 w-full sticky md:top-[100px] top-[160px] z-40 h-[200px] md:h-[600px] rounded-lg shadow-md border-2 p-3 overflow-auto">
+          <SidebarDivar setOptions={setOptions} />
+        </div>
+        <div className="flex gap-5 flex-wrap justify-center overflow-auto md:w-5/6 w-full">
           {commodities.map((el, i) => (
             <Kala
               id={el.id}
@@ -331,7 +376,8 @@ const Home: React.FC = () => {
               key={i}
               title={el.title}
               price={el.price}
-              imageSrc={el.picture}
+              type={type}
+              imageSrc={type !== 'Commodity' ? null : `http://127.0.0.1:8000${el.picture}`}
               agent={el.agent ? true : false}
             />
           ))}
@@ -359,12 +405,12 @@ const Home: React.FC = () => {
             <a href="/dashboard" className="text-gray-500 text-sm">
               پنل کاربری
             </a>
-            <a href="/auction" className="text-gray-500 text-sm">
+            {/* <a href="/auction" className="text-gray-500 text-sm">
               مزایده ها
             </a>
             <a href="/tenders" className="text-gray-500 text-sm">
               مناقصه ها
-            </a>
+            </a> */}
           </div>
         </div>
       </div>

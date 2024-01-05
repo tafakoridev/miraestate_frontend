@@ -102,15 +102,26 @@ const User: React.FC = (props: any) => {
           currently_enrolled: false,
           user_id: 0,
         });
-
+        Notify.init({
+          width: '300px',
+          position: 'left-bottom',
+          });
         Notify.success("رکورد تحصیلات جدید با موفقیت افزوده شد");
       } else {
+        Notify.init({
+          width: '300px',
+          position: 'left-bottom',
+          });
         Notify.failure("تاریخ شروع و پایان را انتخاب کنید");
         console.error("Failed to add education record:", response.statusText);
       }
 
       Loading.remove();
     } catch (error) {
+      Notify.init({
+        width: '300px',
+        position: 'left-bottom',
+        });
       Notify.failure("تاریخ شروع و پایان را انتخاب کنید");
       console.error("Error adding education record:", error);
       Loading.remove();
@@ -147,6 +158,10 @@ const User: React.FC = (props: any) => {
 
       if (response.ok) {
         const updatedUser = await response.json();
+        Notify.init({
+          width: '300px',
+          position: 'left-bottom',
+          });
         Notify.success("پروفایل با موفقیت به روزرسانی شد");
         fetchData();
       } else {
@@ -331,15 +346,26 @@ const User: React.FC = (props: any) => {
           currently_enrolled: false,
           user_id: 0,
         });
-
+        Notify.init({
+          width: '300px',
+          position: 'left-bottom',
+          });
         Notify.success("رکورد شغلی جدید با موفقیت افزوده شد");
       } else {
+        Notify.init({
+          width: '300px',
+          position: 'left-bottom',
+          });
         Notify.failure("تاریخ شروع و پایان را انتخاب کنید");
         console.error("Failed to add employee record:", response.statusText);
       }
 
       Loading.remove();
     } catch (error) {
+      Notify.init({
+        width: '300px',
+        position: 'left-bottom',
+        });
       Notify.failure("تاریخ شروع و پایان را انتخاب کنید");
       console.error("Error adding employee record:", error);
       Loading.remove();

@@ -293,7 +293,7 @@ function Agents() {
                                 </select>
                             </td>
                             <td className="border border-slate-300">
-                                <button onClick={() => router.push(`/dashboard/agent?agentId=${agent.id}`)} className="bg-blue-400 aspect-square w-10 h-10 m-1 rounded-full text-white font-bold text-2xl shadow border-2 border-gray-300">
+                                <button onClick={() => router.push(`/dashboard/user?userId=${agent.id}`)} className="bg-blue-400 aspect-square w-10 h-10 m-1 rounded-full text-white font-bold text-2xl shadow border-2 border-gray-300">
                                     +
                                 </button>
                             </td>

@@ -1,5 +1,5 @@
 "use client";
-import '../dashboard.css'
+import './category.css'
 import Main  from "@/app/components/dashboard/Main";
 import Footer from "@/app/components/dashboard/Footer";
 import Navbar from "@/app/components/dashboard/Nav";
@@ -25,7 +25,7 @@ export default function LoginLayout({
                 <Navbar SetOpen={SetOpen} open={open}/>
             </div>
             <div className="w-full h-[92%]">
-                <Main children={children} title={"دپارتمان های کارشناس"}/> 
+                <Main children={children} title={" کارشناسی"}/> 
             </div>
             <div className="w-full bg-gray-200 h-[2%]">
                 <Footer />

@@ -121,13 +121,13 @@ console.log(props);
       myHeaders.append("Accept", "application/json");
       myHeaders.append("Authorization", `Bearer ${token}`);
       const formObject = new FormData();
-      formObject.append('category_id', formData.category_id.toString());
+      formObject.append('category_id', formData.category_id?.toString());
       formObject.append('title', formData.title);
       formObject.append('description', formData.description);
-      formObject.append('price', formData.price.toString());
-      formObject.append('city_id', formData.city_id.toString());
+      formObject.append('price', formData.price?.toString());
+      formObject.append('city_id', formData.city_id?.toString());
       if (formData.agent_id !== undefined) {
-        formObject.append('agent_id', formData.agent_id.toString());
+        formObject.append('agent_id', formData.agent_id?.toString());
       }
 
       if (formData.picture && formData.picture instanceof File) {
