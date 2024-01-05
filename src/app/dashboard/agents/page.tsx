@@ -178,8 +178,8 @@ function Agents() {
         Loading.pulse();
         let updatedagent: Agent;
         agent.information[field] = newField;
-        delete agent.information.created_at;
-        delete agent.information.updated_at;
+        delete agent.information?.created_at;
+        delete agent.information?.updated_at;
         updatedagent = agent.information;
 
 
@@ -287,7 +287,7 @@ function Agents() {
                                
                             </td>
                             <td className="border border-slate-300">
-                                <select value={agent.information.is_active} onChange={e => editagentinformation('is_active', agent, e.target.value)}>
+                                <select value={agent.information?.is_active ?? 0} onChange={e => editagentinformation('is_active', agent, e.target.value)}>
                                     <option value="active">فعال</option>
                                     <option value="deactive">غیرفعال</option>
                                 </select>
