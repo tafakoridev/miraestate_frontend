@@ -245,9 +245,9 @@ function Commodities() {
               <th className="border text-blue-800 bg-slate-300">شهر</th>
               <th className="border text-blue-800 bg-slate-300">دسته بندی</th>
               <th className="border text-blue-800 bg-slate-300">تصویر</th>
-              <th className="border text-blue-800 bg-slate-300">ویرایش</th>
+              {/* <th className="border text-blue-800 bg-slate-300">ویرایش</th>
               <th className="border text-blue-800 bg-slate-300">حذف</th>
-              <th className="border text-blue-800 bg-slate-300">انقضا</th>
+              <th className="border text-blue-800 bg-slate-300">انقضا</th> */}
               <th className="border text-blue-800 bg-slate-300">نظر کارشناس</th>
             </tr>
           </thead>
@@ -292,7 +292,7 @@ function Commodities() {
                     )}
                   </div>
                 </td>
-                <td className="border border-slate-300 w-1/12">
+                {/* <td className="border border-slate-300 w-1/12">
                   <button
                     className=" text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
                     onClick={() =>
@@ -311,10 +311,10 @@ function Commodities() {
                   >
                     حذف
                   </button>
-                </td>
-                <td className="w-1/12 border border-slate-300 ">
+                </td> */}
+                {/* <td className="w-1/12 border border-slate-300 ">
                   {remainedDays(commodity.expired_at)} روز دیگر
-                </td>
+                </td> */}
                 <td
                   className={`${
                     commodity.agent ? "w-1/4" : "w-1/12"

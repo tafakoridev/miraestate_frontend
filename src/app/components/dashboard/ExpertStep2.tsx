@@ -5,6 +5,8 @@ interface Step {
   setCityId: Function;
   previousStep: Function;
   nextStep: Function;
+  bkp: S2BKP;
+  setBKP: Function;
 }
 
 interface City {
@@ -12,16 +14,30 @@ interface City {
   name: string;
 }
 
+interface S2BKP {
+  selectedProvince: string;
+  selectedCity: string;
+}
+
 interface Province {
   id: number;
   name: string;
 }
 
-function ExpertStep2({ title, setCityId, previousStep, nextStep }: Step) {
+function ExpertStep2({
+  title,
+  setCityId,
+  previousStep,
+  nextStep,
+  bkp,
+  setBKP,
+}: Step) {
   const [cities, SetCities] = useState<City[]>([]);
   const [provinces, SetProvinces] = useState<Province[]>([]);
-  const [selectedProvince, SetSelectedProvince] = useState("0");
-  const [selectedCity, SetSelectedCity] = useState("0");
+  const [selectedProvince, SetSelectedProvince] = useState(
+    bkp.selectedProvince
+  );
+  const [selectedCity, SetSelectedCity] = useState(bkp.selectedCity);
   const [disabled, SetDisabled] = useState(true);
 
   useEffect(() => {
@@ -67,7 +83,7 @@ function ExpertStep2({ title, setCityId, previousStep, nextStep }: Step) {
   const getCities = async (): Promise<void> => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cities`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cities/${selectedProvince}`,
         {
           method: "GET",
           headers: {
@@ -172,6 +188,10 @@ function ExpertStep2({ title, setCityId, previousStep, nextStep }: Step) {
           onClick={() => {
             setCityId(selectedCity);
             nextStep();
+            setBKP({
+              selectedCity,
+              selectedProvince,
+            });
           }}
           className={`${
             disabled ? "cursor-not-allowed" : "cursor-pointer"

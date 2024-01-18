@@ -144,6 +144,16 @@ const User: React.FC = (props: any) => {
         delete updatedUserBefore.educations;
         delete updatedUserBefore.employees;
       }
+      if(updatedUserBefore.national_code?.length !== 10)
+      {
+        Notify.init({
+          width: '300px',
+          position: 'left-bottom',
+          });
+        Notify.failure("کد ملی صحیح نمی باشد")
+        Loading.remove();
+        return 
+      }
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/update/${user?.id}`,
         {

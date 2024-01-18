@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 interface Step {
@@ -18,7 +19,7 @@ interface Category {
 function ExpertStep5({ title,  previousStep, nextStep, categoryId }: Step) {
   const [category, setCategory] = useState<Category>();
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-
+  const router = useRouter();
   const handleCheckboxChange = () => {
     setAgreedToTerms(!agreedToTerms);
   };
@@ -49,7 +50,11 @@ function ExpertStep5({ title,  previousStep, nextStep, categoryId }: Step) {
     }
   };
 
-
+  const handleNavigate = (e: any) => {
+    e.preventDefault();
+    // Open the "/rules" page in a new tab
+    window.open('/rules', '_blank');
+  };
 
 
 
@@ -86,7 +91,7 @@ function ExpertStep5({ title,  previousStep, nextStep, categoryId }: Step) {
             onChange={handleCheckboxChange}
             className="mx-2"
           />
-          با قوانین  سایت موافق هستم
+          با <span className="text-blue-500 cursor-pointer" onClick={handleNavigate}>قوانین</span>  سایت موافق هستم
         </label>
       </div>
       <div className="flex justify-between w-full">

@@ -123,7 +123,7 @@ const Profile: React.FC = () => {
 
     try {
       const updatedUserBefore = { ...user };
-
+    
       // Remove the 'information' property if it exists
       if (updatedUserBefore) {
         delete updatedUserBefore.information;
@@ -132,6 +132,16 @@ const Profile: React.FC = () => {
         delete updatedUserBefore.updated_at;
         delete updatedUserBefore.educations;
         delete updatedUserBefore.employees;
+      }
+      if(updatedUserBefore.national_code?.length !== 10)
+      {
+        Notify.init({
+          width: '300px',
+          position: 'left-bottom',
+          });
+        Notify.failure("کد ملی صحیح نمی باشد")
+        Loading.remove();
+        return 
       }
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/update/${user?.id}`, {
         method: 'PUT',
@@ -376,6 +386,8 @@ const Profile: React.FC = () => {
                 type="text"
                 id="nationalCode"
                 name="nationalCode"
+                minLength={10}
+                maxLength={10}
                 value={user.national_code ?? ""}
                 onChange={(e) => setUser({ ...user, national_code: e.target.value })}
                 className="mt-1 p-2 w-full border rounded-md"

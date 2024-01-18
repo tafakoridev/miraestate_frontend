@@ -18,7 +18,31 @@ interface FormData {
   picture: File | null;
 }
 
+interface S1BKP {
+  selected: string;
+  selected2: string;
+  selected3: string;
+}
+
+interface S2BKP {
+  selectedProvince: string;
+  selectedCity: string;
+}
+
 function ExpertCmp() {
+  const [S1BKP, setS1BKP] = useState<S1BKP>({
+    selected: "",
+    selected2: "",
+    selected3: "",
+  });
+  const [S2BKP, setS2BKP] = useState<S2BKP>({
+    selectedCity: "0",
+    selectedProvince: "0",
+  });
+  const [S3BKP, setS3BKP] = useState({});
+  const [S4BKP, setS4BKP] = useState({});
+  const [S5BKP, setS5BKP] = useState({});
+
   const [category_id, setCategoryId] = useState("0");
   const [city_id, setCityId] = useState("0");
   const [title, setTitle] = useState("");
@@ -79,7 +103,7 @@ function ExpertCmp() {
 
         Notify.success("پرداخت با موفقیت انجام شد");
         Notify.success(responseData.success);
-        setTimeout(() => router.push("/dashboard/commodities/index"), 1000)
+        setTimeout(() => router.push("/dashboard/commodities/index"), 1000);
       } else {
         console.error("Failed to create commodity:", response.statusText);
       }
@@ -93,6 +117,8 @@ function ExpertCmp() {
     <div className="lg:w-1/3 w-full">
       {step === 1 && (
         <ExpertStep1
+          bkp={S1BKP}
+          setBKP={(bkp: S1BKP) => setS1BKP(bkp)}
           setCategoryId={(category_id: string) => setCategoryId(category_id)}
           nextStep={() => setStep(step + 1)}
           title="دسته بندی مورد نظر را انتخاب کنید"
@@ -100,6 +126,8 @@ function ExpertCmp() {
       )}
       {step === 2 && (
         <ExpertStep2
+        bkp={S2BKP}
+        setBKP={(bkp: S2BKP) => setS2BKP(bkp)}
           setCityId={(city_id: string) => setCityId(city_id)}
           previousStep={() => setStep(1)}
           nextStep={() => setStep(3)}

@@ -4,6 +4,14 @@ interface Step {
   title: string;
   setCategoryId: Function;
   nextStep: Function;
+  bkp: S1BKP;
+  setBKP: Function;
+}
+
+interface S1BKP {
+  selected: string;
+  selected2: string;
+  selected3: string;
 }
 
 interface Category {
@@ -14,18 +22,24 @@ interface Category {
   recursive_children: Category[];
 }
 
-function ExpertStep1({ title, setCategoryId, nextStep }: Step) {
+function ExpertStep1({ title, setCategoryId, nextStep, bkp, setBKP }: Step) {
   const [categories, SetCategories] = useState<Category[]>([]);
   const [categories2, SetCategories2] = useState<Category[]>([]);
   const [categories3, SetCategories3] = useState<Category[]>([]);
-  const [selected, SetSelected] = useState("0");
-  const [selected2, SetSelected2] = useState("0");
-  const [selected3, SetSelected3] = useState("0");
+  const [selected, SetSelected] = useState(bkp.selected);
+  const [selected2, SetSelected2] = useState(bkp.selected2);
+  const [selected3, SetSelected3] = useState(bkp.selected3);
   const [disabled, SetDisabled] = useState(true);
   useEffect(() => {
     getCategories();
   }, []);
+  useEffect(() => {
+    findStepOne();
+  }, [selected]);
 
+  useEffect(() => {
+    findStepBKP();
+  }, [categories]);
   function getLastSelected() {
     const values = [selected, selected2, selected3];
 
@@ -49,20 +63,27 @@ function ExpertStep1({ title, setCategoryId, nextStep }: Step) {
     if (selected !== "0") checkConditions();
   }, [selected2, selected3]);
 
-  useEffect(() => {
+  function findStepOne() {
     if (selected !== "0") {
       checkConditions();
-      SetSelected2("0");
-      SetSelected3("0");
+
       SetCategories2([]);
       SetCategories3([]);
-      getCategory(Number(selected), 1)
+      getCategory(Number(selected), 1);
     }
-  }, [selected]);
+  }
+
+  function findStepBKP() {
+    console.log(selected, selected2);
+
+    getCategory(Number(selected), 1);
+    getCategory(Number(selected2), 2);
+  }
 
   function getCategory(id: number, step: number): void {
     if (step === 1) {
       const foundCategory = categories.find((category) => category.id === id);
+      console.log(foundCategory);
 
       if (foundCategory && foundCategory.recursive_children.length > 0)
         SetCategories2(foundCategory.recursive_children);
@@ -89,7 +110,6 @@ function ExpertStep1({ title, setCategoryId, nextStep }: Step) {
         // Successful response handling
         const data = await response.json();
         SetCategories(data.categories);
-        console.log(data.categories);
       } else {
         // Error handling
         console.error("Failed to fetch agents Title:", response.statusText);
@@ -110,6 +130,9 @@ function ExpertStep1({ title, setCategoryId, nextStep }: Step) {
           onChange={(e) => {
             SetSelected(e.target.value);
             getCategory(Number(e.target.value), 1);
+
+            SetSelected2("0");
+            SetSelected3("0");
           }}
           className="block appearance-none w-full bg-white border border-gray-300 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline-blue focus:border-blue-300"
         >
@@ -205,6 +228,11 @@ function ExpertStep1({ title, setCategoryId, nextStep }: Step) {
         onClick={() => {
           setCategoryId(getLastSelected());
           nextStep();
+          setBKP({
+            selected,
+            selected2,
+            selected3,
+          });
         }}
         className={`${
           disabled ? "cursor-not-allowed" : "cursor-pointer"
