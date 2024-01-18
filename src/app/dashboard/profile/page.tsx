@@ -332,9 +332,9 @@ const Profile: React.FC = () => {
 
   return (
     <div className="p-4">
-
       {user && (
         <>
+          <h2>امتیاز کارشناس: { user.information ? `${user?.information.rate}` : 0} </h2>
           <FileAgentUpload image={user.information ? `${user?.information.profile_photo_url}` : ''} onFileChange={(file) => { }} />
           <form className='flex flex-row flex-wrap'>
 

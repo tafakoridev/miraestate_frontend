@@ -204,7 +204,7 @@ const CommodityCreate: React.FC = () => {
             ))}
           </select>
 
-          <select
+          {/* <select
             name="agent_id"
             value={formData.agent_id ?? ""}
             onChange={handleInputChange}
@@ -216,7 +216,7 @@ const CommodityCreate: React.FC = () => {
                 {agent.name} - {agent.phonenumber}
               </option>
             ))}
-          </select>
+          </select> */}
 
           {/* Price input field */}
           <input

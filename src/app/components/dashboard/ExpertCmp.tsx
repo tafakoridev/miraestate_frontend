@@ -24,7 +24,7 @@ function ExpertCmp() {
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [file, SetFile] = useState<File>();
+  const [files, SetFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState<FormData>({
     category_id: 0,
     title: "",
@@ -47,8 +47,11 @@ function ExpertCmp() {
       formObject.append("description", description);
       formObject.append("price", price);
       formObject.append("city_id", city_id);
-      if (file) {
-        formObject.append("picture", file);
+      if (files?.length > 0) {
+        files.forEach((file, index) => {
+          // Append each file with a unique name or handle filenames as needed
+          formObject.append(`pictures[${index}]`, file);
+        });
       }
 
       // Post new commodity with the specified data
@@ -117,8 +120,8 @@ function ExpertCmp() {
       )}
       {step === 4 && (
         <ExpertStep4
-          setItems={(file: File) => {
-            SetFile(file);
+          setItems={(files: File[]) => {
+            SetFiles(files);
           }}
           previousStep={() => setStep(3)}
           nextStep={() => setStep(5)}
@@ -127,7 +130,7 @@ function ExpertCmp() {
       )}
       {step === 5 && (
         <ExpertStep5
-          previousStep={() => setStep(3)}
+          previousStep={() => setStep(4)}
           nextStep={handleSubmit}
           categoryId={category_id}
           title="صورت حساب"

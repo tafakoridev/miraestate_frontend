@@ -4,7 +4,7 @@ import Main from "../components/dashboard/Main";
 import Footer from "../components/dashboard/Footer";
 import Navbar from "../components/dashboard/Nav";
 import Sidebar from "../components/dashboard/Sidebar";
-import { GetUser, IsActiveAgent, IsAgent, IsLogin } from "../utils/Auth";
+import { GetProfileAgent, GetUser, IsActiveAgent, IsAgent, IsLogin } from "../utils/Auth";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -29,20 +29,22 @@ const DashobardPage = () => {
   const router = useRouter();
 
   const fetchData = async () => {
+    Notify.init({
+      width: "300px",
+      position: "left-bottom",
+    });
     try {
       const isLogin = IsLogin();
       const isAgent = await IsAgent();
 
       if (isAgent) {
+        
+        await GetProfileAgent();
         const isActiveAgent = await IsActiveAgent();
-        console.log(isActiveAgent);
 
         if (!isActiveAgent) {
           Loading.pulse();
-          Notify.init({
-            width: "300px",
-            position: "left-bottom",
-          });
+          
           Notify.failure("حساب کارشناسی شما هنوز فعال نشده است");
         }
       }

@@ -205,7 +205,7 @@ console.log(props);
           </select>
 
           {/* Agent select box */}
-          <select
+          {/* <select
             name="agent_id"
             value={formData.agent_id !== undefined ? formData.agent_id : ''}
             onChange={handleInputChange}
@@ -217,7 +217,7 @@ console.log(props);
                 {agent.name} - {agent.phonenumber}
               </option>
             ))}
-          </select>
+          </select> */}
 
           {/* Price input field */}
           <input

@@ -141,7 +141,8 @@ function Agents() {
         delete agent.created_at;
         delete agent.updated_at;
         updatedagent = agent;
-
+        if(agent.role !== 'role')
+        delete agent.information;
 
         const token = GetToken();
         try {
@@ -287,7 +288,7 @@ function Agents() {
                                
                             </td>
                             <td className="border border-slate-300">
-                                <select value={agent.information?.is_active ?? 0} onChange={e => editagentinformation('is_active', agent, e.target.value)}>
+                                <select value={agent.information?.is_active ?? "deactive"} onChange={e => editagentinformation('is_active', agent, e.target.value)}>
                                     <option value="active">فعال</option>
                                     <option value="deactive">غیرفعال</option>
                                 </select>

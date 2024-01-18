@@ -1,3 +1,4 @@
+import { Notify } from "notiflix";
 import Education from "../interfaces/Education";
 import Employee from "../interfaces/Employee";
 
@@ -64,6 +65,26 @@ async function GetUserById(id: string): Promise<IUser | undefined> {
     }
 }
 
+
+async function GetProfileAgent(): Promise<undefined> {
+    if (IsLogin()) {
+        const token = GetToken();
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/checkProfile`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        
+        const result = await res.json();
+        if (res.status === 400) {
+            Notify.failure(result.error)
+        }
+    }
+}
+
 async function checkRole(): Promise<any> {
     if (IsLogin()) {
         const user = await GetUser();
@@ -110,4 +131,4 @@ async function IsActiveAgent(): Promise<boolean> {
 //     }
 // }
 
-export { IsLogin, GetUser, GetToken, checkRole, IsAdmin, IsAgent, IsActiveAgent, GetUserById }
+export { IsLogin, GetUser, GetToken, checkRole, IsAdmin, IsAgent, IsActiveAgent, GetUserById, GetProfileAgent }

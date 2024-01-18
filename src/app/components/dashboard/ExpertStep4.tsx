@@ -1,3 +1,4 @@
+import { Notify } from "notiflix";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 interface Step {
@@ -7,54 +8,80 @@ interface Step {
   nextStep: Function;
 }
 
-interface City {
-  id: number;
-  name: string;
-}
-
-interface Province {
-  id: number;
-  name: string;
-}
-
 function ExpertStep4({ title, setItems, previousStep, nextStep }: Step) {
-  const [file, SetFile] = useState<File>();
-  const [preview, SetPreview] = useState<string>("");
-  const [disabled, SetDisabled] = useState(true);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [disabled, setDisabled] = useState(true);
   const inputFileRef = useRef<HTMLInputElement>(null);
 
+
+  const handleRemoveFile = (index: number) => {
+    const updatedFiles = [...files];
+    updatedFiles.splice(index, 1);
+
+    const updatedPreviews = [...previews];
+    updatedPreviews.splice(index, 1);
+
+    setFiles(updatedFiles);
+    setPreviews(updatedPreviews);
+  };
+
+
   function checkConditions() {
-    if(preview !== "") SetDisabled(false);
+    if (previews.length > 0) setDisabled(false);
+    else setDisabled(true);
   }
 
   useEffect(() => {
     checkConditions();
-  }, [preview]);
+  }, [previews]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    SetFile(selectedFile);
-    if (selectedFile) {
-      const url = URL.createObjectURL(selectedFile);
-      SetPreview(url);
+    if (previews.length >= 5) {
+      Notify.failure("حداکثر ۵ تصویر می تواند انتخاب شود");
+      return;
     }
+    const selectedFiles = event.target.files;
+    if (!selectedFiles) return;
+
+    const newFiles = Array.from(selectedFiles);
+    const updatedFiles = [...files, ...newFiles];
+    setFiles(updatedFiles);
+
+    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+    const updatedPreviews = [...previews, ...newPreviews];
+    setPreviews(updatedPreviews);
   };
 
   return (
     <div className="border p-5 rounded-md shadow min-h-[350px] w-full flex justify-between gap-3 flex-col items-center">
       <h2 className="text-center">{title}</h2>
-      <div className="flex flex-col gap-2 w-full">
-        {/* first */}
-        {preview && <div className="border rounded-md overflow-hidden">
-          <img src={preview} alt={"preview"} className="w-full h-auto" />
-        </div>}
-
+      <div className="flex flex-col gap-2 w-full flex-wrap">
+        {/* Display previews for each selected image */}
+        <div className="flex gap-2 flex-wrap">
+       {previews.map((preview, index) => (
+            <div key={index} className="relative border rounded-md overflow-hidden">
+              <img
+                src={preview}
+                alt={`preview-${index}`}
+                width={100}
+                className="h-full object-contain"
+              />
+              <button
+                className="absolute top-2  text-xs right-2 w-[20px] h-[20px] bg-red-500 text-white rounded-full p-1 cursor-pointer aspect-square"
+                onClick={() => handleRemoveFile(index)}
+              >
+                X
+              </button>
+            </div>
+          ))}
+        </div>
         <div className="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
           <label
             htmlFor="fileInput"
             className="block text-gray-700 text-sm font-bold mb-2"
           >
-            انتخاب تصویر:
+            انتخاب تصاویر:
           </label>
           <div className="flex items-center justify-between">
             <input
@@ -63,14 +90,17 @@ function ExpertStep4({ title, setItems, previousStep, nextStep }: Step) {
               className="hidden"
               ref={inputFileRef}
               onChange={handleFileChange}
+              multiple // Allow multiple file selection
             />
             <button
               onClick={() => inputFileRef.current?.click()}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md cursor-pointer"
             >
-              بارگذاری عکس
+              بارگذاری عکس‌ها
             </button>
-            <span id="selectedFileName" className="ml-2 text-gray-500"></span>
+            <span id="selectedFileName" className="ml-2 text-gray-500">
+              {files.length} تصویر انتخاب شده
+            </span>
           </div>
         </div>
       </div>
@@ -87,7 +117,7 @@ function ExpertStep4({ title, setItems, previousStep, nextStep }: Step) {
         <button
           disabled={disabled}
           onClick={() => {
-            setItems(file);
+            setItems(files); // Send all selected files to the parent component
             nextStep();
           }}
           className={`${
