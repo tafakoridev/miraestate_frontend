@@ -67,27 +67,6 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
       }
     };
 
-    if (selectedRole === 'agent') {
-      // Fetch departments from /api/departments if the role is 'agent'
-      const fetchDepartments = async () => {
-        Loading.pulse();
-        const token = GetToken();
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/departments`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const data = await response.json();
-          setDepartments(data.departments);
-          Loading.remove();
-        } catch (error) {
-          console.error('Error fetching departments:', error);
-        }
-      };
-
-      fetchDepartments();
-    }
 
     fetchCategories();
   }, [selectedRole]);
@@ -95,7 +74,6 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
   const handleRoleChange = (role: string) => {
     setSelectedRole(role);
     setSelectedCategories([]);
-    setSelectedDepartments([]);
   };
 
   const handleSetRole = async () => {
@@ -120,16 +98,9 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
           return;
         }
 
-        if (selectedDepartments.length == 0) {
-          Notify.init({
-            position: "left-bottom",
-          })
-          Notify.warning('لطفاً حداقل یک دپارتمان  را انتخاب کنید');
-          return;
-        }
+      
 
         requestBody.categories = selectedCategories;
-        requestBody.departments = selectedDepartments;
       }
       Loading.pulse();
       // Post method to set user role
@@ -192,22 +163,6 @@ const SetRole: React.FC<SetRoleProps> = ({ onClose }) => {
                     >
                       {category.title}
                     </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-col mb-4">
-              <label className="mb-2">انتخاب دپارتمان:</label>
-              <div className="flex gap-2 my-2 flex-wrap">
-                {departments.map((department) => (
-                  <div key={department.id}>
-                    <button
-                      className={`px-2 mb-0 mt-1 py-1 rounded-md ${selectedDepartments.includes(department.id) ? 'border-2 border-blue-800' : 'border border-gray-400'}`}
-                      onClick={() => toggleDepartment(department.id)}
-                    >
-                      {department.title}
-                    </button>
-                    
                   </div>
                 ))}
               </div>
