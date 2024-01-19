@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Loading, Notify } from "notiflix";
 import { GetToken } from "@/app/utils/Auth";
+import GlassCard from "@/app/components/dashboard/GlassCard";
 
 interface Category {
   id: number;
@@ -11,9 +12,16 @@ interface Category {
   parent_id: string;
 }
 
+interface Field {
+  title: string;
+  value: string;
+}
+
+
 function Categories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategoryTitle, setNewCategoryTitle] = useState("");
+  const [is_open_fields, setIsOpenFields] = useState("");
   const [newCategoryPrice, setNewCategoryPrice] = useState("");
   const [newCategoryParentId, setNewCategoryPrantId] = useState("0");
   const [edit, setEdit] = useState(false);
@@ -91,7 +99,6 @@ function Categories() {
     );
   };
 
-
   const handleEditParentIdCategory = (id: number, newParentId: string) => {
     // Update category title locally
     setCategories((prevCategories) =>
@@ -105,8 +112,7 @@ function Categories() {
     id: number,
     newTitle: string,
     newPrice: string,
-    newParentId: string,
-    
+    newParentId: string
   ) => {
     const token = GetToken();
     Loading.pulse();
@@ -120,7 +126,11 @@ function Categories() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ title: newTitle, price: newPrice, parent_id: newParentId }),
+          body: JSON.stringify({
+            title: newTitle,
+            price: newPrice,
+            parent_id: newParentId,
+          }),
         }
       );
 
@@ -182,8 +192,43 @@ function Categories() {
     }
   };
 
+  async function saveToCategory(fields: Field[], id: string) {
+    
+    const token = GetToken();
+    Loading.pulse();
+    try {
+      // Post new tender with the specified data
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/savetocategory/${id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({fields}),
+        }
+      );
+
+      if (response.ok) {
+        Loading.remove();
+        Notify.init({
+          width: "300px",
+          position: "left-bottom",
+        });
+        Notify.success("فیلدها با موفقیت ذخیره شدند");
+        setIsOpenFields("");
+      } else {
+        console.error("Failed to create tender:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error creating tender:", error);
+    }
+  }
+
   return (
     <div>
+      {is_open_fields && <GlassCard id={is_open_fields} onClose={() => setIsOpenFields("")} onSend={(obj: Field[], id: string) => saveToCategory(obj, id)} />}
       <div className="flex w-full justify-around items-start flex-wrap px-4">
         {/* Form to add new category */}
         <div className="flex lg:w-1/4 w-full">
@@ -220,9 +265,13 @@ function Categories() {
                 className="bg-gray-100 rounded-lg p-2 m-1 w-full"
                 onChange={(e) => setNewCategoryPrantId(e.target.value)}
               >
-                <option key={222222222} disabled value="0">انتخاب دسته بندی</option>
+                <option key={222222222} disabled value="0">
+                  انتخاب دسته بندی
+                </option>
                 {categories.map((category, i) => (
-                    <option key={i} value={category.id}>{category.title}</option>
+                  <option key={i} value={category.id}>
+                    {category.title}
+                  </option>
                 ))}
               </select>
             </div>
@@ -250,6 +299,9 @@ function Categories() {
                 </th>
                 <th className="border text-blue-800 bg-slate-300 h-[40px]">
                   دسته والد
+                </th>
+                <th className="border text-blue-800 bg-slate-300 h-[40px]">
+                  فیلدها
                 </th>
                 <th className="border text-blue-800 bg-slate-300 h-[40px]">
                   ویرایش
@@ -285,17 +337,31 @@ function Categories() {
                       className="bg-gray-100 rounded-lg p-2"
                     />
                   </td>
-                  <td className="border border-slate-300 w-[200px] h-[40px]">
+                  <td className="border border-slate-300 w-[150px] h-[40px]">
                     <select
                       value={category.parent_id ?? "0"}
                       className="bg-gray-100 rounded-lg p-2 m-1 w-5/6"
-                      onChange={(e) => handleEditParentIdCategory(category.id, e.target.value)}
+                      onChange={(e) =>
+                        handleEditParentIdCategory(category.id, e.target.value)
+                      }
                     >
-                        <option key={22525} value={"0"} disabled>بدون والد</option>
+                      <option key={22525} value={"0"} disabled>
+                        بدون والد
+                      </option>
                       {categories.map((category, i) => (
-                        <option key={i} value={category.id}>{category.title}</option>
+                        <option key={i} value={category.id}>
+                          {category.title}
+                        </option>
                       ))}
                     </select>
+                  </td>
+                  <td className="w-[90px] border border-slate-300 h-[40px]">
+                    <button
+                      className="bg-blue-500 aspect-square w-full h-7 rounded-md text-white font-bold text-xs shadow border-2 border-gray-300"
+                      onClick={() => setIsOpenFields(`${category.id}`)}
+                    >
+                      مدیریت فیلدها
+                    </button>
                   </td>
                   <td className="border border-slate-300 h-[40px]">
                     <button

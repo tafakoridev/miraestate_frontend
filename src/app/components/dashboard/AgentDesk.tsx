@@ -4,6 +4,7 @@ import { Loading, Notify } from "notiflix";
 import { GetToken } from "@/app/utils/Auth";
 import Slider from "react-slick";
 import Image from "next/image";
+import { log } from "util";
 interface ModalProps {
   onClose: () => void;
   type: string;
@@ -13,8 +14,19 @@ interface ModalProps {
 interface City {
   name: string;
 }
-interface Category {
+
+
+interface Field {
   title: string;
+  value: string;
+}
+
+interface Category {
+  id: number;
+  title: string;
+  price: string;
+  parent_id: string;
+  fields: Field[];
 }
 
 interface Commodity {
@@ -42,7 +54,7 @@ const AgentDesk: React.FC<ModalProps> = ({ onClose, type, id }) => {
   const [description, setDescription] = useState("");
   const [Commodity, setCommodity] = useState<Commodity>();
   const [selectedPicture, setSelectedPicture] = useState(null);
-
+  const [fields, setFields] = useState<Field[]>([]);
   const openModal = (picture: any) => {
     setSelectedPicture(picture);
     document.body.style.overflow = "hidden"; // Prevent scrolling when the modal is open
@@ -68,7 +80,9 @@ const AgentDesk: React.FC<ModalProps> = ({ onClose, type, id }) => {
       localStorage.removeItem("api_token");
     }
     const result = await res.json();
+    
     setCommodity(result.commodity);
+    setFields(JSON.parse(result.commodity.fields))
   }
   useEffect(() => {
     getComodity(); // Call the function in the useEffect body
@@ -94,7 +108,7 @@ const AgentDesk: React.FC<ModalProps> = ({ onClose, type, id }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ description, type, id }),
+          body: JSON.stringify({ description, type, id, fields: JSON.stringify(fields) }),
         }
       );
 
@@ -114,8 +128,16 @@ const AgentDesk: React.FC<ModalProps> = ({ onClose, type, id }) => {
     }
   };
 
+  const handleInputChange = (index: number, value: string) => {
+    setFields((prevFields) => {
+      const newFields = [...prevFields];
+      newFields[index] = { title: newFields[index].title, value: value };
+      return newFields;
+    });
+  };
+
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
+    <div className="fixed top-0 left-0 w-full overflow-auto h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
       {Commodity &&
         Commodity.picture &&
         Commodity.picture.length > 0 &&
@@ -173,11 +195,28 @@ const AgentDesk: React.FC<ModalProps> = ({ onClose, type, id }) => {
                 )}
               </Slider>
               <p className="w-full border-2 flex flex-col mt-10 mb-1 justify-between px-5 py-2 rounded"><span>شرح:</span>{Commodity.description}</p>
-          {Commodity.price && 
-              <p className="w-full border-2 my-2 flex justify-between px-5 py-2 rounded"><b>قیمت</b><span>{Commodity.price} تومان</span></p>
-            }
+  
+
+{fields.map((field, index) => (
+    <p key={index} className="w-full border-2 my-2 flex justify-between px-5 py-2 rounded"><b>{field.title}</b>
+   
+    
+    <input
+            key={index}
+            type="text"
+            value={field.value}
+            onChange={(e) => handleInputChange(index, e.target.value)}
+            className="p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+          />
+    </p>
+        
+        ))}
             </div>
           )}
+
+
+
+
           <textarea
             value={description}
             onChange={handleDescriptionChange}

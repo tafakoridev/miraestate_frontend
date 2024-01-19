@@ -29,6 +29,12 @@ interface S2BKP {
   selectedCity: string;
 }
 
+interface Field {
+  title: string;
+  value: string;
+}
+
+
 function ExpertCmp() {
   const [S1BKP, setS1BKP] = useState<S1BKP>({
     selected: "",
@@ -46,6 +52,7 @@ function ExpertCmp() {
   const [category_id, setCategoryId] = useState("0");
   const [city_id, setCityId] = useState("0");
   const [title, setTitle] = useState("");
+  const [fields, setFields] = useState<Field[]>();
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [files, SetFiles] = useState<File[]>([]);
@@ -71,6 +78,7 @@ function ExpertCmp() {
       formObject.append("description", description);
       formObject.append("price", price);
       formObject.append("city_id", city_id);
+      formObject.append("fields", JSON.stringify(fields));
       if (files?.length > 0) {
         files.forEach((file, index) => {
           // Append each file with a unique name or handle filenames as needed
@@ -136,11 +144,13 @@ function ExpertCmp() {
       )}
       {step === 3 && (
         <ExpertStep3
-          setItems={(title: string, description: string, price: string) => {
+          setItems={(title: string, description: string, price: string, fields: Field[]) => {
             setTitle(title);
+            setFields(fields);
             setDescription(description);
             setPrice(price);
           }}
+          category_id={category_id}
           previousStep={() => setStep(2)}
           nextStep={() => setStep(4)}
           title="عنوان و توضیحات را وارد کنید"

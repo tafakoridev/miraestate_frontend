@@ -260,7 +260,7 @@ function Commodities() {
                   {commodity.description}
                 </td>
                 <td className="border border-slate-300 w-1/12">
-                  {commodity.price} تومان
+                  {commodity.price == 0.00 ? '---': `${commodity.price}تومان `} 
                 </td>
                 <td className="border border-slate-300 w-1/12">
                   {commodity.city?.name}
