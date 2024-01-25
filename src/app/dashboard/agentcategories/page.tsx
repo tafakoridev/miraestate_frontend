@@ -10,6 +10,7 @@ interface Category {
   field_id: number;
   field: {
     title: string;
+    price: string;
     // Add other properties if needed
   };
   price: number;
@@ -103,8 +104,8 @@ function AgentCategories() {
             <tr>
               <th className="border text-blue-800 bg-slate-300">#</th>
               <th className="border text-blue-800 bg-slate-300">عنوان</th>
-              <th className="border text-blue-800 bg-slate-300">دستمزد</th>
-              <th className="border text-blue-800 bg-slate-300">عملیات</th>
+              <th className="border text-blue-800 bg-slate-300">حق کارشناسی</th>
+              {/* <th className="border text-blue-800 bg-slate-300">عملیات</th> */}
               {/* Add more table headers if needed */}
             </tr>
           </thead>
@@ -113,7 +114,8 @@ function AgentCategories() {
               <tr key={index}>
                 <td className="border border-slate-300 w-1/12">{index + 1}</td>
                 <td className="border border-slate-300 w-1/4">{category.field.title}</td>
-                <td className="border border-slate-300 w-1/4">
+                <td className="border border-slate-300 w-1/4">{category.field.price} تومان</td>
+                {/* <td className="border border-slate-300 w-1/4">
                   <input
                     type="number"
                     value={category.price}
@@ -121,10 +123,10 @@ function AgentCategories() {
                     onChange={(e) => handlePriceChange(index, parseFloat(e.target.value))}
                   />
                   تومان
-                </td>
-                <td className="border border-slate-300 w-1/4">
+                </td> */}
+                {/* <td className="border border-slate-300 w-1/4">
                   <button  className="my-2 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mx mb-2" onClick={() => handleSavePrice(category)}>ذخیره</button>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

@@ -37,11 +37,7 @@ function Sidebar({ SetOpen, open }: any) {
           path={"/dashboard"}
           icon={"/assets/icons8-home-144.png"}
         />
-        <Item
-          title={"کارشناسی"}
-          path={"/dashboard/expert"}
-          icon={"/assets/icons8-agent-100.png"}
-        />
+
         {isAdmin && (
           <>
             <Item
@@ -59,8 +55,43 @@ function Sidebar({ SetOpen, open }: any) {
               path={"/dashboard/categories"}
               icon={"/assets/icons8-opened-folder-96.png"}
             />
+            <Item
+              title={"درخواست انتشار"}
+              path={"/dashboard/cartable"}
+              icon={"/assets/icons8-pack-luggage-48.png"}
+            />
+            <Item
+              title={"نظرات"}
+              path={"/dashboard/comments"}
+              icon={"/assets/icons8-comments-64.png"}
+            />
           </>
         )}
+
+        <Item
+          title={"کارشناسی ها"}
+          icon={"/assets/icons8-plus-48.png"}
+          setOpen={() => {
+            isOpen == "expert" ? setOpen("") : setOpen("expert");
+          }}
+        />
+        {isOpen == "expert" && (
+          <>
+            <Item
+              child={true}
+              title={"ثبت درخواست"}
+              path={"/dashboard/expert"}
+              icon={"/assets/icons8-agent-100.png"}
+            />
+            <Item
+              child={true}
+              title={"لیست درخواست ها"}
+              path={"/dashboard/clientcartable"}
+              icon={"/assets/icons8-box-60.png"}
+            />
+          </>
+        )}
+
         <Item
           title={"کالا و خدمات"}
           icon={"/assets/icons8-plus-48.png"}
@@ -84,6 +115,7 @@ function Sidebar({ SetOpen, open }: any) {
             />
           </>
         )}
+
         <Item
           title={" مناقصه ها"}
           path={"/dashboard/tenders/list"}
@@ -146,11 +178,7 @@ function Sidebar({ SetOpen, open }: any) {
               path={"/dashboard/agentcategories"}
               icon={"/assets/icons8-opened-folder-96.png"}
             />
-            <Item
-              title={"دپارتمان های من"}
-              path={"/dashboard/agentdepartments"}
-              icon={"/assets/icons8-opened-folder-96.png"}
-            />
+
             <Item
               title={"پروفایل من"}
               path={"/dashboard/profile"}
