@@ -14,6 +14,7 @@ interface User {
     role: string;
     state: string;
     city_id: string;
+    wallet: string;
     updated_at: string;
     information: Information;
 }

@@ -32,3 +32,10 @@
     width: 32px;
     height: 32px;
   }
+
+  .wallet {
+    background: url("../../../public/assets/icons8-wallet-64.png");
+    background-size: cover;
+    width: 24px;
+    height: 24px;
+  }

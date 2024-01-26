@@ -65,6 +65,21 @@ function Sidebar({ SetOpen, open }: any) {
               path={"/dashboard/comments"}
               icon={"/assets/icons8-comments-64.png"}
             />
+            <Item
+              title={"کارتابل مناقصه"}
+              path={"/dashboard/readytopublish"}
+              icon={"/assets/icons8-pack-luggage-48.png"}
+            />
+            <Item
+              title={"کارتابل مزایده"}
+              path={"/dashboard/readytopublishauction"}
+              icon={"/assets/icons8-pack-luggage-48.png"}
+            />
+            <Item
+              title={"تنظیمات"}
+              path={"/dashboard/options"}
+              icon={"/assets/icons8-settings-64.png"}
+            />
           </>
         )}
 
@@ -192,7 +207,7 @@ function Sidebar({ SetOpen, open }: any) {
             localStorage.removeItem("api_token");
             router.push("/login");
           }}
-          className={`text-center w-3/4 mx-[12.5%] my-2 p-2 rounded-lg shadow-lg h-100 bg-white cursor-pointer `}
+          className={`text-center w-[92%] mx-[4%] my-2 p-2 rounded-lg shadow-lg h-100 bg-white cursor-pointer `}
         >
           خروج
         </div>
