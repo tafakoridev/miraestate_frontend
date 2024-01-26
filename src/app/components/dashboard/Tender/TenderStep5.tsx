@@ -61,6 +61,7 @@ function TenderStep5({ title,  previousStep, nextStep }: Step) {
 
   
   function formatNumberWithCommas(value: any) {
+    if(!value) value = 0;
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
