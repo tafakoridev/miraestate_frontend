@@ -2,10 +2,7 @@
 import React, { useState } from "react";
 import { Notify } from "notiflix";
 import { GetToken } from "@/app/utils/Auth";
-Notify.init({
-  width: '300px',
-  position: 'left-bottom',
-  });
+
 interface Purpose {
   id: number;
   description: string;
@@ -33,6 +30,10 @@ const TenderPurposeList: React.FC<TenderPurposeListProps> = ({
   };
 
   const handleCall = () => {
+    Notify.init({
+      width: '300px',
+      position: 'left-bottom',
+      });
     if (accepted?.phonenumber) {
       Notify.success("در حال تماس...");
       location.href = "tel://" + accepted?.phonenumber;
@@ -45,7 +46,10 @@ const TenderPurposeList: React.FC<TenderPurposeListProps> = ({
   
   const handleSendPurposeAccept = async (id: number, user_id: number) => {
     const token = GetToken();
-
+    Notify.init({
+      width: '300px',
+      position: 'left-bottom',
+      });
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tenders/purpose/accept`, {
         method: 'POST',
