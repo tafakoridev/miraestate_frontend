@@ -11,10 +11,12 @@ interface Agent {
 }
 
 interface Purpose {
-    id: number;
-    description: string;
-    price: number;
-    user: User;
+  id: number;
+  description: string;
+  price: number;
+  user: User;
+  user_id: number;
+  purposeable_id: number;
 }
 
 interface Tender {
@@ -32,6 +34,7 @@ interface Tender {
   end: string;
   fields: string;
   is_active: number;
+  winner: User;
 }
 
 interface Field {
@@ -72,7 +75,7 @@ function Tenders() {
       );
       const data = await response.json();
       setTenders(data.tenders);
-      
+
       Loading.remove();
     } catch (error) {
       console.error("Error fetching tenders:", error);
@@ -111,15 +114,18 @@ function Tenders() {
     const token = GetToken();
     Loading.pulse();
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tenders/client/set/end`,{
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({id }),
-      });
-      
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tenders/client/set/end`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ id }),
+        }
+      );
+
       if (response.ok) {
         const result = await response.json();
         fetchTenders();
@@ -184,22 +190,29 @@ function Tenders() {
               </td>
               <td className="border border-slate-300">{tender.price}تومان</td>
               <td className="border border-slate-300">
-                از  &nbsp;<span dir="ltr">{moment(tender.start).format("jYYYY-jM-jD")}</span>
-                &nbsp;
-                تا 
-                &nbsp;
-                <span dir="ltr">{moment(tender.end).format("jYYYY-jM-jD")}</span>
+                از &nbsp;
+                <span dir="ltr">
+                  {moment(tender.start).format("jYYYY-jM-jD")}
+                </span>
+                &nbsp; تا &nbsp;
+                <span dir="ltr">
+                  {moment(tender.end).format("jYYYY-jM-jD")}
+                </span>
               </td>
               <td className="border border-slate-300">{tender.address}</td>
               <td className="border border-slate-300">
-              {tender.fields && 
-                JSON.parse(tender.fields).map((field: Field, i: number) => (
-                  <div key={i} className="flex justify-between border p-1 my-3">
-                    <div><b>{field.title}</b></div>
-                    <div>{field.value}</div>
-                  </div>
-                ))
-              }
+                {tender.fields &&
+                  JSON.parse(tender.fields).map((field: Field, i: number) => (
+                    <div
+                      key={i}
+                      className="flex justify-between border p-1 my-3"
+                    >
+                      <div>
+                        <b>{field.title}</b>
+                      </div>
+                      <div>{field.value}</div>
+                    </div>
+                  ))}
               </td>
               <td className="border border-slate-300">
                 <div className="flex justify-evenly">
@@ -211,24 +224,30 @@ function Tenders() {
                     حذف
                   </button>
                   {/* <button className="w-20 my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => handleEditTender(tender.id)}>ویرایش</button> */}
-                  {
-                    tender.is_active !== 3 && <button
-                    className="w-30 my-2 float-left text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
-                    onClick={() => handleEndTender(tender.id)}
-                  >
-                    اعلام پایان  
-                  </button>
-                  }
+                  {tender.is_active !== 3 && (
+                    <button
+                      className="w-30 my-2 float-left text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                      onClick={() => handleEndTender(tender.id)}
+                    >
+                      اعلام پایان
+                    </button>
+                  )}
                 </div>
               </td>
               <td className="border border-slate-300">
                 <div className="flex justify-center">
-                  <button
-                    className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
-                    onClick={() => handleShowTenderPurposeList(tender)}
-                  >
-                    پیشنهادها
-                  </button>
+                  {tender.winner ? (
+                    <div className="flex flex-col">
+                      <b>برنده</b>
+                      <span>{tender.winner.name}</span>
+                      <span> {tender.winner.phonenumber}</span>
+                    </div>
+                  ) : <button
+                  className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                  onClick={() => handleShowTenderPurposeList(tender)}
+                >
+                  پیشنهادها
+                </button>}
                 </div>
               </td>
               <td className="border border-slate-300">

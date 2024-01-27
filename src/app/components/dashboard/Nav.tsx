@@ -8,6 +8,7 @@ interface CountsObject {
   tendersCount: number;
   auctionsCount: number;
   commoditiesCount: number;
+  notificationsCount: number;
   tendersCountDecline: number;
   auctionsCountDecline: number;
   commoditiesCountDecline: number;
@@ -20,6 +21,8 @@ function Navbar({ SetOpen, open }: any) {
 
   const toggleNotifications = () => {
     setShowNotifications((prev) => !prev);
+    fetchAgentsInseenAll();
+    fetchAgentsInCounter();
   };
 
   const closeNotifications = () => {
@@ -34,6 +37,7 @@ function Navbar({ SetOpen, open }: any) {
       tendersCount = 0,
       auctionsCount = 0,
       commoditiesCount = 0,
+      notificationsCount = 0,
       tendersCountDecline = 0,
       auctionsCountDecline = 0,
       commoditiesCountDecline = 0,
@@ -44,6 +48,7 @@ function Navbar({ SetOpen, open }: any) {
       tendersCount +
       auctionsCount +
       commoditiesCount +
+      notificationsCount +
       tendersCountDecline +
       auctionsCountDecline +
       commoditiesCountDecline;
@@ -70,7 +75,37 @@ function Navbar({ SetOpen, open }: any) {
       if (response.ok) {
         // Successful response handling
         const data = await response.json();
+        
         setAgentsCount(calculateTotalCounts(data));
+      } else {
+        // Error handling
+        console.error("Failed to fetch agents count:", response.statusText);
+      }
+    } catch (error) {
+      // Catch any unexpected errors
+      console.error("Error fetching agents count:", error);
+    }
+  };
+
+  const fetchAgentsInseenAll = async (): Promise<void> => {
+    const token = GetToken();
+    const user = await GetUser();
+    setUser(user);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/agents/in/seen`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Successful response handling
+        const data = await response.json();
       } else {
         // Error handling
         console.error("Failed to fetch agents count:", response.statusText);

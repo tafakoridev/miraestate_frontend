@@ -3,16 +3,18 @@ import ExpertStep1 from "./ExpertStep1";
 import ExpertStep2 from "./ExpertStep2";
 import ExpertStep3 from "./ExpertStep3";
 import ExpertStep4 from "./ExpertStep4";
-import ExpertStep5 from "./ExpertStep5";
 import { Loading, Notify } from "notiflix";
 import { GetToken } from "@/app/utils/Auth";
 import { useRouter } from "next/navigation";
+import ExpertStep5 from "./ExpertStep5";
+import ExpertStep6 from "./ExpertStep6";
 
 interface FormData {
   category_id: number;
   title: string;
   description: string;
   price: number;
+  local: boolean;
   city_id: number;
   agent_id: number | null;
   picture: File | null;
@@ -52,6 +54,7 @@ function ExpertCmp() {
   const [category_id, setCategoryId] = useState("0");
   const [city_id, setCityId] = useState("0");
   const [title, setTitle] = useState("");
+  const [local, setLocal] = useState(0);
   const [fields, setFields] = useState<Field[]>();
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
@@ -61,6 +64,7 @@ function ExpertCmp() {
     title: "",
     description: "",
     price: 0,
+    local: false,
     city_id: 0,
     agent_id: null,
     picture: null,
@@ -78,6 +82,7 @@ function ExpertCmp() {
       formObject.append("description", description);
       formObject.append("price", price);
       formObject.append("city_id", city_id);
+      formObject.append("local", String(local));
       formObject.append("fields", JSON.stringify(fields));
       if (files?.length > 0) {
         files.forEach((file, index) => {
@@ -111,7 +116,7 @@ function ExpertCmp() {
 
         Notify.success("پرداخت با موفقیت انجام شد");
         Notify.success(responseData.success);
-        setTimeout(() => router.push("/dashboard/commodities/index"), 1000);
+        setTimeout(() => router.push("/dashboard/clientcartable"), 1000);
       } else {
         console.error("Failed to create commodity:", response.statusText);
       }
@@ -169,6 +174,14 @@ function ExpertCmp() {
       {step === 5 && (
         <ExpertStep5
           previousStep={() => setStep(4)}
+          nextStep={() => setStep(6)}
+          submit={(local: number) => setLocal(local)}
+          title="کارشناس در محل"
+        />
+      )}
+      {step === 6 && (
+        <ExpertStep6
+          previousStep={() => setStep(5)}
           nextStep={handleSubmit}
           categoryId={category_id}
           title="صورت حساب"

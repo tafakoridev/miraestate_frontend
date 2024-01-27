@@ -27,6 +27,7 @@ interface Commodity {
   description: string;
   price: number;
   city_id: number;
+  local: number;
   picture: string;
   city: City;
   category: Category;
@@ -89,7 +90,6 @@ function Commodities() {
   };
   useEffect(() => {
     // Fetch commodities from /commodities endpoint
-   
 
     fetchCommodities();
   }, [openComment]);
@@ -212,13 +212,12 @@ function Commodities() {
     }
   };
 
-
   const handleUpdateCommodity = async (commodityId: number) => {
     const token = GetToken();
-  
+
     try {
       const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/client/commodities/${commodityId}`;
-  
+
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -226,10 +225,10 @@ function Commodities() {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (response.ok) {
         const updatedCommodityData = await response.json();
-        if(updatedCommodityData.retval){
+        if (updatedCommodityData.retval) {
           Notify.init({
             width: "300px",
             position: "left-bottom",
@@ -237,8 +236,6 @@ function Commodities() {
           Notify.success(" با موفقیت برای انتشار ارسال شد");
           fetchCommodities();
         }
-
-        
       } else {
         console.error("Failed to update commodity:", response.statusText);
       }
@@ -246,7 +243,39 @@ function Commodities() {
       console.error("Error updating commodity:", error);
     }
   };
-  
+
+  const handleAgentReview = async (commodityId: number) => {
+    const token = GetToken();
+
+    try {
+      const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/client/commodities/reviewed`;
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id: commodityId }),
+      });
+
+      if (response.ok) {
+        const updatedCommodityData = await response.json();
+        if (updatedCommodityData.retval) {
+          Notify.init({
+            width: "300px",
+            position: "left-bottom",
+          });
+          Notify.success("به عنوان بازدید شده ثبت شد");
+          fetchCommodities();
+        }
+      } else {
+        console.error("Failed to update commodity:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error updating commodity:", error);
+    }
+  };
 
   return (
     <div>
@@ -370,6 +399,33 @@ function Commodities() {
                   <div className="flex justify-center items-center flex-col gap-3">
                     <b>نظر کارشناس: </b>
                     {commodity.agent ? commodity.agent.description : "ندارد"}
+                    {commodity.local == 0 && (
+                        <b
+                          className={
+                            "bg-red-300 p-1 text-xs rounded-md text-red-800"
+                          }
+                        >
+                          بازدید در محل ندارد
+                        </b>
+                      )}
+                      {commodity.local == 1 && (
+                        <b
+                          className={
+                            "bg-yellow-300 p-1 text-xs rounded-md text-yellow-800"
+                          }
+                        >
+                          بازدید در محل دارد
+                        </b>
+                      )}
+                      {commodity.local == 3 && (
+                        <b
+                          className={
+                            "bg-green-300 p-1 text-xs rounded-md text-green-800"
+                          }
+                        >
+                          بازدید در محل انجام شد
+                        </b>
+                      )}
                     <br />
                     {commodity.agent?.comment ? (
                       <p>
@@ -390,11 +446,22 @@ function Commodities() {
                         نظردهی
                       </button>
                     )}
+                    {commodity.local && commodity.local !== 3 && (
+                      <button
+                        onClick={() => handleAgentReview(commodity.id)}
+                        className="bg-blue-500 text-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs"
+                      >
+                        تایید بازدید
+                      </button>
+                    )}
                   </div>
                 </td>
                 <td className={`border border-slate-300`}>
                   <div className="flex justify-center items-center flex-col gap-3">
-                    <button onClick={() => handleUpdateCommodity(commodity.id)} className="bg-blue-500 text-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs">
+                    <button
+                      onClick={() => handleUpdateCommodity(commodity.id)}
+                      className="bg-blue-500 text-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs"
+                    >
                       انتشار عمومی
                     </button>
                   </div>

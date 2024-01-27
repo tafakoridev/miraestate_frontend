@@ -44,6 +44,7 @@ interface Commodity {
   agent: Agent;
   agent_id: number;
   user: User;
+  local: number;
 }
 
 function AgentIn() {
@@ -72,8 +73,6 @@ function AgentIn() {
     }
   };
   useEffect(() => {
-
-
     fetchAgentInData();
   }, []); // Empty dependency array to ensure the effect runs only once on mount
 
@@ -124,6 +123,9 @@ function AgentIn() {
                     کارشناسی
                   </th>
                   <th className="border text-blue-800 bg-slate-300 h-[40px]">
+                    بازدید در محل
+                  </th>
+                  <th className="border text-blue-800 bg-slate-300 h-[40px]">
                     عملیات
                   </th>
                   {/* Add more headers as needed */}
@@ -162,6 +164,35 @@ function AgentIn() {
                           </button>
                         )}
                       </div>
+                    </td>
+                    <td className="border border-slate-300">
+                      {commodity.local == 0 && (
+                        <b
+                          className={
+                            "bg-red-300 p-1 text-xs rounded-md text-red-800"
+                          }
+                        >
+                          بازدید در محل ندارد
+                        </b>
+                      )}
+                      {commodity.local == 1 && (
+                        <b
+                          className={
+                            "bg-yellow-300 p-1 text-xs rounded-md text-yellow-800"
+                          }
+                        >
+                          بازدید در محل دارد
+                        </b>
+                      )}
+                      {commodity.local == 3 && (
+                        <b
+                          className={
+                            "bg-green-300 p-1 text-xs rounded-md text-green-800"
+                          }
+                        >
+                          بازدید در محل انجام شد
+                        </b>
+                      )}
                     </td>
                     <td className="border border-slate-300">
                       <div className="flex justify-center">
