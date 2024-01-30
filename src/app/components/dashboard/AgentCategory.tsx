@@ -19,7 +19,7 @@ interface Category {
 }
 
 // Define the functional component
-function AgentCategories() {
+function AgentCategory({ agent_id }: any) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [allcategories, setAllCategories] = useState<Category[]>([]);
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -36,13 +36,11 @@ function AgentCategories() {
   function removeDuplicates(arr: any) {
     return Array.from(new Set(arr));
   }
-  
 
   const handleUpdate = async () => {
     Loading.pulse();
     const token = GetToken();
-    const UniqueSelectedCategories = removeDuplicates(selectedCategories)
-
+    const UniqueSelectedCategories = removeDuplicates(selectedCategories);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories/agent/update`,
@@ -52,7 +50,7 @@ function AgentCategories() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ categories: UniqueSelectedCategories }),
+          body: JSON.stringify({ categories: UniqueSelectedCategories, agent_id }),
         }
       );
       const data = await response.json();
@@ -60,29 +58,8 @@ function AgentCategories() {
         position: "left-bottom",
       });
       data.retval && Notify.success("ویرایش دسته بندی ها با موفقیت انجام شد");
-      getAgentCategories()
+      console.log(data);
 
-      Loading.remove();
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  const fetchCategories = async () => {
-    Loading.pulse();
-    const token = GetToken();
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-
-      setAllCategories(data.categories);
       Loading.remove();
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -90,6 +67,28 @@ function AgentCategories() {
   };
 
   useEffect(() => {
+    // Fetch categories from /api/categories
+    const fetchCategories = async () => {
+      Loading.pulse();
+      const token = GetToken();
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await response.json();
+
+        setAllCategories(data.categories);
+        Loading.remove();
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
     fetchCategories();
   }, []);
 
@@ -98,7 +97,7 @@ function AgentCategories() {
     const token = GetToken();
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/agent/category-expertises`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/agent/category-expertises/${agent_id}`,
         {
           method: "GET",
           headers: {
@@ -188,7 +187,6 @@ function AgentCategories() {
       <h1 className="text-md font-bold mb-4">دسته بندی های کارشناس</h1>
       <div className="flex flex-col mb-4">
         <label className="mb-2">انتخاب دسته بندی:</label>
-
         <div className="flex gap-2 my-2 flex-wrap">
           {allcategories.map((category) => (
             <div key={category.id}>
@@ -206,46 +204,7 @@ function AgentCategories() {
           ))}
         </div>
       </div>
-      {categories.length > 0 ? (
-        <table className="table-auto border-collapse w-[1000px] text-center md:w-full">
-          <thead>
-            <tr>
-              <th className="border text-blue-800 bg-slate-300">#</th>
-              <th className="border text-blue-800 bg-slate-300">عنوان</th>
-              <th className="border text-blue-800 bg-slate-300">حق کارشناسی</th>
-              {/* <th className="border text-blue-800 bg-slate-300">عملیات</th> */}
-              {/* Add more table headers if needed */}
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((category, index) => (
-              <tr key={index}>
-                <td className="border border-slate-300 w-1/12">{index + 1}</td>
-                <td className="border border-slate-300 w-1/4">
-                  {category.field.title}
-                </td>
-                <td className="border border-slate-300 w-1/4">
-                  {category.field.price} تومان
-                </td>
-                {/* <td className="border border-slate-300 w-1/4">
-                  <input
-                    type="number"
-                    value={category.price}
-                    className="w-1/3"
-                    onChange={(e) => handlePriceChange(index, parseFloat(e.target.value))}
-                  />
-                  تومان
-                </td> */}
-                {/* <td className="border border-slate-300 w-1/4">
-                  <button  className="my-2 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mx mb-2" onClick={() => handleSavePrice(category)}>ذخیره</button>
-                </td> */}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>برای این کارشناس هیچ دسته بندی موجود نیست.</p>
-      )}
+
       <button
         onClick={handleUpdate}
         className="w-30 my-2 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2 float-left"
@@ -256,4 +215,4 @@ function AgentCategories() {
   );
 }
 
-export default AgentCategories;
+export default AgentCategory;

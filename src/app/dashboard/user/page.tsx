@@ -7,6 +7,7 @@ import { Loading, Notify } from "notiflix";
 import React, { useState, useEffect } from "react";
 import DatePicker from "persian-react-datepicker";
 import moment from "moment-jalaali";
+import AgentCategory from "@/app/components/dashboard/AgentCategory";
 
 interface IUser extends User {
   city: City;
@@ -895,6 +896,7 @@ const User: React.FC = (props: any) => {
           </div>
         </>
       )}
+      <AgentCategory agent_id={userId}/>
     </div>
   );
 };
