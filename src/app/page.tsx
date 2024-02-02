@@ -377,7 +377,7 @@ const Home: React.FC = () => {
               title={el.title}
               price={el.price}
               type={type}
-              imageSrc={type !== 'Commodity' ? `http://127.0.0.1:8000${JSON.parse(el.picture)[0]}` : `http://127.0.0.1:8000${JSON.parse(el.picture)[0]}`}
+              imageSrc={type !== 'Commodity' ? `http://87.107.146.142:8089${JSON.parse(el.picture)[0]}` : `http://87.107.146.142:8089${JSON.parse(el.picture)[0]}`}
               agent={el.agent ? true : false}
             />
           ))}
