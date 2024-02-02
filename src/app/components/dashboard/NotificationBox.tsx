@@ -12,6 +12,7 @@ interface Item {
   id: number;
   title: string;
   text: string;
+  route: string;
 }
 
 interface ItemDecline {
@@ -151,13 +152,17 @@ const NotificationBox: React.FC<NotificationBoxProps> = ({
               {tenderDecline.decline.substring(0, 22)}
             </li>
           ))}
-          {agentsTitle.notifications.map((notification) => (
+          {agentsTitle.notifications.map((notification: Item) => (
             <li
-              onClick={() =>
-                router.push(
-                  `/dashboard/clientcartable`
-                )
-              }
+              onClick={() => {
+                let route: string = "";
+                notification.route === 'tenders' && (route = '/dashboard/tenders/list');
+                notification.route === 'auctions' && (route = '/dashboard/auctions/list');
+                notification.route === 'commodities' && (route = '/dashboard/cartable');
+                notification.route === 'tenders_purpose' && (route = '/dashboard/tenders/purposes');
+                notification.route === 'auctions_purpose' && (route = '/dashboard/auctions/purposes');
+                router.push(route);
+              }}
               className="py-2 border-b-2"
               dir="rtl"
               key={notification.id}
@@ -167,11 +172,11 @@ const NotificationBox: React.FC<NotificationBoxProps> = ({
           ))}
           {agentsTitle.auctionsDecline.map((auctionDecline) => (
             <li
-              onClick={() =>
-                router.push(
-                  `/dashboard/commodities/edit?commodityId=${auctionDecline.id}`
-                )
-              }
+              // onClick={() =>
+              //   // router.push(
+              //   //   `/dashboard/commodities/edit?commodityId=${auctionDecline.id}`
+              //   // )
+              // }
               className="py-2 border-b-2"
               dir="rtl"
               key={auctionDecline.id}
@@ -183,11 +188,11 @@ const NotificationBox: React.FC<NotificationBoxProps> = ({
 
           {agentsTitle.commoditiesDecline.map((commodityDecline) => (
             <li
-              onClick={() =>
-                router.push(
-                  `/dashboard/commodities/edit?commodityId=${commodityDecline.id}`
-                )
-              }
+              // onClick={() =>
+              //   router.push(
+              //     `/dashboard/commodities/edit?commodityId=${commodityDecline.id}`
+              //   )
+              // }
               className="py-2 border-b-2"
               dir="rtl"
               key={commodityDecline.id}

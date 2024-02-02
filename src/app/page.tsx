@@ -246,9 +246,11 @@ const Home: React.FC = () => {
         <div className="visible absolute left-1 top-2 md:invisible flex justify-end items-center px-2">
           {isLogin ? (
             <>
-              <button className="bg-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs">
-                {user?.name ?? "کاربر"}
+            <a href="/dashboard">
+              <button  className="bg-white text-center justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs">
+                پنل کاربری
               </button>
+              </a>
               <button
                 className="bg-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs mx-1"
                 onClick={() => {
@@ -325,9 +327,10 @@ const Home: React.FC = () => {
             <div className="hidden md:flex  justify-end w-2/3 h-full items-center px-3">
               {isLogin ? (
                 <>
-                  <button className="bg-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs">
-                    {user?.name ?? "کاربر"}
-                  </button>
+                 <a href="/dashboard">
+                   <button  className="bg-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs">
+                پنل کاربری
+              </button></a>
                   <button
                     className="bg-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs mx-1"
                     onClick={() => {
