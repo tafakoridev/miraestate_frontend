@@ -242,7 +242,10 @@ function Auctions() {
                 </div>
               </td>
               <td className="border border-slate-300">
-                {auction.is_active ? "تایید شده" : "تایید نشده"}
+                {auction.is_active === 2 && "تایید شده"}
+                {auction.is_active === 1 && "تایید نشده"}
+                {auction.is_active === 5 && "در انتظار پایان"}
+                {auction.is_active === 3 && "پایان یافته"}
               </td>
             </tr>
           ))}

@@ -32,8 +32,9 @@ interface Auction {
   start: string;
   end: string;
   fields: string;
-  is_active: boolean;
+  is_active: number;
   winner: User;
+  user_id: number;
 }
 
 interface Field {
@@ -105,7 +106,7 @@ function ReadyToPublish() {
     fetchauctions();
   }, []); // Empty dependency array to ensure the effect runs only once on mount
 
-  const handleShowTenderPurposeList = (Auction: Auction) => {
+  const handleShowauctionPurposeList = (Auction: Auction) => {
     setSelectedAuctionId(Auction.id);
     setAuctionPurposeList(Auction.purpose);
     setShowAuctionPurposeList(true);
@@ -133,6 +134,44 @@ function ReadyToPublish() {
       Notify.success("مزایده با موفقیت حذف شد");
     } catch (error) {
       console.error("Error deleting Auction:", error);
+    }
+  };
+
+  const handleEndAuction = async (id: number, user_id: number) => {
+    const token = GetToken();
+    Loading.pulse();
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auctions/admin/set/end`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ id, user_id }),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        fetchauctions();
+        Notify.success(result.msg);
+      } else {
+        const data = await response.json();
+        Notify.failure(`خطا: ${data.error}`);
+      }
+      setauctions((prevauctions) =>
+        prevauctions.filter((auction) => auction.id !== id)
+      );
+      Loading.remove();
+      Notify.init({
+        width: "300px",
+        position: "left-bottom",
+      });
+      Notify.success("مناقصه با موفقیت پایان یافت");
+    } catch (error) {
+      console.error("Error deleting auction:", error);
     }
   };
 
@@ -219,6 +258,17 @@ function ReadyToPublish() {
                     </button>
                   </div>
                 )}
+
+                {auction.is_active === 5 && (
+                  <div className="flex justify-center">
+                    <button
+                      className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                      onClick={() => handleEndAuction(auction.id, auction.user_id)}
+                    >
+                      تایید پایان
+                    </button>
+                  </div>
+                )}
               </td>
               <td className="border border-slate-300">
                 <div className="flex justify-center">
@@ -231,7 +281,7 @@ function ReadyToPublish() {
                   ) : (
                     <button
                       className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
-                      onClick={() => handleShowTenderPurposeList(auction)}
+                      onClick={() => handleShowauctionPurposeList(auction)}
                     >
                       پیشنهادها
                     </button>
@@ -240,7 +290,10 @@ function ReadyToPublish() {
               </td>
 
               <td className="border border-slate-300">
-                {auction.is_active ? "تایید شده" : "تایید نشده"}
+                {auction.is_active === 2 && "تایید شده"}
+                {auction.is_active === 1 && "در انتظار تایید"}
+                {auction.is_active === 5 && "در انتظار پایان"}
+                {auction.is_active === 3 && "پایان یافته"}
               </td>
             </tr>
           ))}
