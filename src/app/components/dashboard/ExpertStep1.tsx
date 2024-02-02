@@ -162,7 +162,7 @@ function ExpertStep1({ title, setCategoryId, nextStep, bkp, setBKP }: Step) {
       {options.length > 0 && (
           <SelectSearch
             value={selected}
-            onChange={(value) => {
+            onChange={(value: any) => {
               SetSelected(String(value));
               getCategory(Number(value), 1);
 
@@ -212,7 +212,7 @@ function ExpertStep1({ title, setCategoryId, nextStep, bkp, setBKP }: Step) {
           {options2.length > 0 && (
           <SelectSearch
             value={selected2}
-            onChange={(value) => {
+            onChange={(value: any) => {
               SetSelected2(String(value));
               getCategory(Number(value), 2);
             }}
