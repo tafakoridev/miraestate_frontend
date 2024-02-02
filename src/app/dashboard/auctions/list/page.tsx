@@ -145,6 +145,44 @@ function Auctions() {
     }
   };
 
+  const handleEndTenderCanceling = async (id: number) => {
+    const token = GetToken();
+    Loading.pulse();
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auctions/client/set/endcanceling`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ id }),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        fetchAuctions();
+        Notify.success(result.msg);
+      } else {
+        const data = await response.json();
+        Notify.failure(`خطا: ${data.error}`);
+      }
+      setAuctions((prevTenders) =>
+        prevTenders.filter((tender) => tender.id !== id)
+      );
+      Loading.remove();
+      Notify.init({
+        width: "300px",
+        position: "left-bottom",
+      });
+      Notify.success("رد کردن مناقصه گذار ثبت شد");
+    } catch (error) {
+      console.error("Error deleting tender:", error);
+    }
+  };
+
   const handleEditauction = (id: number) => {
     // Redirect to the edit page with the auction_id query parameter
     router.push(`/dashboard/Auctions/edit?auction_id=${id}`);
@@ -174,7 +212,7 @@ function Auctions() {
             <th className="border text-blue-800 bg-slate-300">آدرس</th>
             <th className="border text-blue-800 bg-slate-300">فیلدها</th>
             <th className="border text-blue-800 bg-slate-300">عملیات</th>
-            <th className="border text-blue-800 bg-slate-300">پیشنهادها</th>
+            <th className="border text-blue-800 bg-slate-300">برنده</th>
             <th className="border text-blue-800 bg-slate-300">وضعیت</th>
           </tr>
         </thead>
@@ -207,15 +245,17 @@ function Auctions() {
               <td className="border border-slate-300">
                 <div className="flex justify-evenly">
                   {/* <button className="w-20 my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => handleEditauction(auction.id)}>ویرایش</button> */}
-                  <button
-                    className="w-20 my-2 float-left text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
-                    onClick={() => handleDeleteauction(auction.id)}
-                  >
-                    حذف
-                  </button>
+                  {(auction.is_active == 1 || auction.is_active == 2) && (
+                    <button
+                      className="w-20 my-2 float-left text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-xs px-4 py-1.5 text-center mb-2"
+                      onClick={() => handleEndTenderCanceling(auction.id)}
+                    >
+                      رد کردن
+                    </button>
+                  )}
                   {/* <button className="w-20 my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => handleEditauction(auction.id)}>ویرایش</button> */}
                   {
-                    auction.is_active !== 3 && <button
+                    (auction.is_active == 1 || auction.is_active == 2)  && <button
                     className="w-30 my-2 float-left text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
                     onClick={() => handleEndauction(auction.id)}
                   >
@@ -232,18 +272,14 @@ function Auctions() {
                       <span>{auction.winner.name}</span>
                       <span> {auction.winner.phonenumber}</span>
                     </div>
-                  ) : <button
-                  className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
-                  onClick={() => handleShowauctionPurposeList(auction)}
-                >
-                  پیشنهادها
-                </button>}
+                  ) : <>-</>}
                   
                 </div>
               </td>
               <td className="border border-slate-300">
-                {auction.is_active === 2 && "تایید شده"}
-                {auction.is_active === 1 && "تایید نشده"}
+              {auction.is_active === 2 && "تایید شده"}
+                {auction.is_active === 0 && "در انتظار تایید"}
+                {auction.is_active === 1 && " تایید شده"}
                 {auction.is_active === 5 && "در انتظار پایان"}
                 {auction.is_active === 3 && "پایان یافته"}
               </td>

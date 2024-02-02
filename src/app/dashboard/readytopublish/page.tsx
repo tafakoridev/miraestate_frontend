@@ -287,7 +287,8 @@ function ReadyToPublish() {
               </td>
               <td className="border border-slate-300">
                 {tender.is_active === 2 && "تایید شده"}
-                {tender.is_active === 1 && "در انتظار تایید"}
+                {tender.is_active === 0 && "در انتظار تایید"}
+                {tender.is_active === 1 && " تایید شده"}
                 {tender.is_active === 5 && "در انتظار پایان"}
                 {tender.is_active === 3 && "پایان یافته"}
               </td>

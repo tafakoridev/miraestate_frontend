@@ -248,7 +248,7 @@ function ReadyToPublish() {
                     حذف
                   </button>
                 </div>
-                {!auction.is_active && (
+                {auction.is_active == 0 && (
                   <div className="flex justify-center">
                     <button
                       className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
@@ -291,7 +291,8 @@ function ReadyToPublish() {
 
               <td className="border border-slate-300">
                 {auction.is_active === 2 && "تایید شده"}
-                {auction.is_active === 1 && "در انتظار تایید"}
+                {auction.is_active === 0 && "در انتظار تایید"}
+                {auction.is_active === 1 && " تایید شده"}
                 {auction.is_active === 5 && "در انتظار پایان"}
                 {auction.is_active === 3 && "پایان یافته"}
               </td>

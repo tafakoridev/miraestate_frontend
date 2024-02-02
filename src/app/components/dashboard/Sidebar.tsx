@@ -34,7 +34,7 @@ function Sidebar({ SetOpen, open }: any) {
         <MiraInformation />
         <Item
           title={"صفحه اصلی"}
-          path={"/dashboard"}
+          path={"/"}
           icon={"/assets/icons8-home-144.png"}
         />
 

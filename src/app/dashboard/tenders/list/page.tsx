@@ -53,19 +53,19 @@ function Tenders() {
     []
   );
 
-
   function findWinnerPurpose(tender: Tender): Purpose | undefined {
     const winnerUser = tender.winner;
     if (winnerUser) {
       // Find the purpose associated with the winner user
-      const winnerPurpose = tender.purpose.find(purpose => purpose.user_id === winnerUser.id);
-  
+      const winnerPurpose = tender.purpose.find(
+        (purpose) => purpose.user_id === winnerUser.id
+      );
+
       return winnerPurpose;
     }
-  
+
     return undefined; // Return undefined if no winner user is specified
   }
-
 
   const handleShowTenderPurposeList = (Tender: Tender) => {
     setSelectedTenderId(Tender.id);
@@ -163,6 +163,44 @@ function Tenders() {
     }
   };
 
+  const handleEndTenderCanceling = async (id: number) => {
+    const token = GetToken();
+    Loading.pulse();
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tenders/client/set/endcanceling`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ id }),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        fetchTenders();
+        Notify.success(result.msg);
+      } else {
+        const data = await response.json();
+        Notify.failure(`خطا: ${data.error}`);
+      }
+      setTenders((prevTenders) =>
+        prevTenders.filter((tender) => tender.id !== id)
+      );
+      Loading.remove();
+      Notify.init({
+        width: "300px",
+        position: "left-bottom",
+      });
+      Notify.success("رد کردن مناقصه گذار ثبت شد");
+    } catch (error) {
+      console.error("Error deleting tender:", error);
+    }
+  };
+
   const handleEditTender = (id: number) => {
     // Redirect to the edit page with the tender_id query parameter
     router.push(`/dashboard/tenders/edit?tender_id=${id}`);
@@ -232,19 +270,21 @@ function Tenders() {
               <td className="border border-slate-300">
                 <div className="flex justify-evenly">
                   {/* <button className="w-20 my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => handleEditTender(tender.id)}>ویرایش</button> */}
-                  <button
-                    className="w-20 my-2 float-left text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-xs px-4 py-1.5 text-center mb-2"
-                    onClick={() => handleDeleteTender(tender.id)}
-                  >
-                    حذف
-                  </button>
+                  {(tender.is_active == 1 || tender.is_active == 2) && (
+                    <button
+                      className="w-20 my-2 float-left text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-xs px-4 py-1.5 text-center mb-2"
+                      onClick={() => handleEndTenderCanceling(tender.id)}
+                    >
+                      رد کردن
+                    </button>
+                  )}
                   {/* <button className="w-20 my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => handleEditTender(tender.id)}>ویرایش</button> */}
-                  {tender.is_active !== 3 && tender.is_active !== 5 && (
+                  {(tender.is_active == 1 || tender.is_active == 2) && (
                     <button
                       className="w-30 my-2 float-left text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg px-4 py-1.5 text-center mb-2 text-xs"
                       onClick={() => handleEndTender(tender.id)}
                     >
-                      اعلام پایان 
+                      اعلام پایان
                     </button>
                   )}
                   {/* {tender.is_active !== 3 && (
@@ -263,11 +303,13 @@ function Tenders() {
                     <div className="flex flex-col">
                       <span>{tender.winner.name}</span>
                       <span> {tender.winner.phonenumber}</span>
-                      <hr className="hr"/>
+                      <hr className="hr" />
                       <span> {findWinnerPurpose(tender)?.price} تومان</span>
                       <span> {findWinnerPurpose(tender)?.description}</span>
                     </div>
-                  ) : <span>-</span>}
+                  ) : (
+                    <span>-</span>
+                  )}
                   {/* <button
                   className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
                   onClick={() => handleShowTenderPurposeList(tender)}
@@ -277,8 +319,9 @@ function Tenders() {
                 </div>
               </td>
               <td className="border border-slate-300">
-                {tender.is_active === 2 && "تایید شده"}
-                {tender.is_active === 1 && "تایید نشده"}
+              {tender.is_active === 2 && "تایید شده"}
+                {tender.is_active === 0 && "در انتظار تایید"}
+                {tender.is_active === 1 && " تایید شده"}
                 {tender.is_active === 5 && "در انتظار پایان"}
                 {tender.is_active === 3 && "پایان یافته"}
               </td>
