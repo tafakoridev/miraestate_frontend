@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SelectSearch from "react-select-search";
 
 interface Step {
   title: string;
@@ -12,6 +13,11 @@ interface S1BKP {
   selected: string;
   selected2: string;
   selected3: string;
+}
+
+interface Option {
+  value: string;
+  name: string;
 }
 
 interface Category {
@@ -30,6 +36,9 @@ function AuctionStep1({ title, setCategoryId, nextStep, bkp, setBKP }: Step) {
   const [selected2, SetSelected2] = useState(bkp.selected2);
   const [selected3, SetSelected3] = useState(bkp.selected3);
   const [disabled, SetDisabled] = useState(true);
+  const [options, setOptions] = useState<Option[]>([]);
+  const [options2, setOptions2] = useState<Option[]>([]);
+
   useEffect(() => {
     getCategories();
   }, []);
@@ -74,7 +83,6 @@ function AuctionStep1({ title, setCategoryId, nextStep, bkp, setBKP }: Step) {
   }
 
   function findStepBKP() {
-
     getCategory(Number(selected), 1);
     getCategory(Number(selected2), 2);
   }
@@ -118,12 +126,52 @@ function AuctionStep1({ title, setCategoryId, nextStep, bkp, setBKP }: Step) {
     }
   };
 
+  useEffect(() => {
+    // Use a functional update to ensure correct state updates
+    setOptions((prevOptions) =>
+      categories.map((category) => ({
+        value: String(category.id),
+        name: category.title,
+      }))
+    );
+
+    // Log options after setting the state
+    console.log(options);
+  }, [categories]);
+
+  useEffect(() => {
+    // Use a functional update to ensure correct state updates
+    setOptions2((prevOptions) =>
+    categories2.map((category) => ({
+        value: String(category.id),
+        name: category.title,
+      }))
+    );
+
+  }, [categories2]);
+
   return (
     <div className="border p-5 rounded-md shadow min-h-[250px] min-w-[250px] flex justify-between gap-3 flex-col items-center">
       <h2>{title}</h2>
       {/* first */}
       <div className="relative inline-block w-64">
-        <select
+        {options.length > 0 && (
+          <SelectSearch
+            value={selected}
+            onChange={(value) => {
+              SetSelected(String(value));
+              getCategory(Number(value), 1);
+
+              SetSelected2("0");
+              SetSelected3("0");
+            }}
+            search={true}
+            options={options}
+            placeholder="انتخاب دسته بندی"
+          />
+        )}
+
+        {/* <select
           value={selected}
           onChange={(e) => {
             SetSelected(e.target.value);
@@ -142,7 +190,7 @@ function AuctionStep1({ title, setCategoryId, nextStep, bkp, setBKP }: Step) {
               {category.title}
             </option>
           ))}
-        </select>
+        </select> */}
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
           <svg
             className="h-4 w-4"
@@ -156,9 +204,21 @@ function AuctionStep1({ title, setCategoryId, nextStep, bkp, setBKP }: Step) {
         </div>
       </div>
       {/* second */}
-      {categories2.length > 0 && (
+      {options2.length > 0 && (
         <div className="relative inline-block w-[15.5rem] mr-2">
-          <select
+          {options2.length > 0 && (
+          <SelectSearch
+            value={selected2}
+            onChange={(value) => {
+              SetSelected2(String(value));
+              getCategory(Number(value), 2);
+            }}
+            search={true}
+            options={options2}
+            placeholder="انتخاب دسته بندی"
+          />
+        )}
+          {/* <select
             value={selected2}
             onChange={(e) => {
               SetSelected2(e.target.value);
@@ -174,7 +234,7 @@ function AuctionStep1({ title, setCategoryId, nextStep, bkp, setBKP }: Step) {
                 {category.title}
               </option>
             ))}
-          </select>
+          </select> */}
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
             <svg
               className="h-4 w-4"

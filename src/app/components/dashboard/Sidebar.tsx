@@ -56,25 +56,42 @@ function Sidebar({ SetOpen, open }: any) {
               icon={"/assets/icons8-opened-folder-96.png"}
             />
             <Item
-              title={"درخواست انتشار"}
-              path={"/dashboard/cartable"}
-              icon={"/assets/icons8-pack-luggage-48.png"}
-            />
-            <Item
               title={"نظرات"}
               path={"/dashboard/comments"}
               icon={"/assets/icons8-comments-64.png"}
             />
+
             <Item
-              title={"کارتابل مناقصه"}
-              path={"/dashboard/readytopublish"}
-              icon={"/assets/icons8-pack-luggage-48.png"}
+              title={"کارتابل"}
+              icon={"/assets/icons8-plus-48.png"}
+              setOpen={() => {
+                isOpen == "cartable" ? setOpen("") : setOpen("cartable");
+              }}
             />
-            <Item
-              title={"کارتابل مزایده"}
-              path={"/dashboard/readytopublishauction"}
-              icon={"/assets/icons8-pack-luggage-48.png"}
-            />
+
+            {isOpen === "cartable" && (
+              <>
+                <Item
+                  title={"کارتابل کارشناسی "}
+                  path={"/dashboard/cartable"}
+                  icon={"/assets/icons8-pack-luggage-48.png"}
+                  child={true}
+                />
+                <Item
+                  title={"کارتابل مناقصه"}
+                  path={"/dashboard/readytopublish"}
+                  icon={"/assets/icons8-pack-luggage-48.png"}
+                  child={true}
+                />
+                <Item
+                  title={"کارتابل مزایده"}
+                  path={"/dashboard/readytopublishauction"}
+                  icon={"/assets/icons8-pack-luggage-48.png"}
+                  child={true}
+                />
+              </>
+            )}
+
             <Item
               title={"تنظیمات"}
               path={"/dashboard/options"}
@@ -153,6 +170,12 @@ function Sidebar({ SetOpen, open }: any) {
               path={"/dashboard/tenders/create"}
               icon={"/assets/icons8-calendar-plus-96.png"}
             />
+            <Item
+              child={true}
+              title={"پیشنهادات من"}
+              path={"/dashboard/tenders/purposes"}
+              icon={"/assets/icons8-send-48.png"}
+            />
           </>
         )}
 
@@ -177,6 +200,12 @@ function Sidebar({ SetOpen, open }: any) {
               title={"ایجاد مزایده"}
               path={"/dashboard/auctions/create"}
               icon={"/assets/icons8-auction-96-add.png"}
+            />
+            <Item
+              child={true}
+              title={"پیشنهادات من"}
+              path={"/dashboard/auctions/purposes"}
+              icon={"/assets/icons8-send-48.png"}
             />
           </>
         )}

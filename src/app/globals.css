@@ -3,6 +3,16 @@
 @tailwind utilities;
 @import "~slick-carousel/slick/slick.css"; 
 @import "~slick-carousel/slick/slick-theme.css";
+@import '~react-select-search/style.css';
+@font-face {
+  font-family: 'Vazirmatn';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/vazirmatn/v13/Dxxo8j6PP2D_kU2muijlGMWWMmk.woff2) format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0898-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -16,6 +26,8 @@
     --background-end-rgb: 0, 0, 0;
   }
 }
+
+
 
 .nicescroll {
   scrollbar-width: thin; /* For Firefox */
@@ -45,3 +57,14 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.select-search-input{
+  direction: rtl;
+  text-align: right;
+  font-family: 'Vazirmatn' !important;
+}
+
+.select-search-options  li button{
+  direction: rtl;
+  text-align: right;
+  font-family: 'Vazirmatn' !important;
+}

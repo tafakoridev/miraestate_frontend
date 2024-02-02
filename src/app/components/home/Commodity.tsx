@@ -7,10 +7,13 @@ import Image from "next/image";
 interface CommodityProps {
   onClose: () => void;
   id: string;
+  notcall: boolean;
 }
 interface Agent {
   description: string;
   agent: User;
+  fields: string;
+  accepted: number;
 }
 
 interface City {
@@ -39,7 +42,7 @@ interface CommodityData {
   fields: string;
 }
 
-const Commodity: React.FC<CommodityProps> = ({ onClose, id }) => {
+const Commodity: React.FC<CommodityProps> = ({ onClose, id, notcall }) => {
   const [commodityData, setCommodityData] = useState<CommodityData | null>(
     null
   );
@@ -81,6 +84,35 @@ const Commodity: React.FC<CommodityProps> = ({ onClose, id }) => {
 
     fetchCommodityData();
   }, []);
+
+
+  const handleAdminAccept = async () => {
+    Loading.pulse();
+    const token = GetToken();
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/commodity/agent/accept`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ id }),
+        }
+      );
+      const data = await response.json();
+      Notify.init({
+        position: "left-bottom",
+      });
+      data.retval && Notify.success(" تایید کارشناسی با موفقیت انجام شد");
+     onClose()
+
+      Loading.remove();
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const handleCall = () => {
     if (commodityData?.phoneNumber) {
@@ -160,7 +192,12 @@ const Commodity: React.FC<CommodityProps> = ({ onClose, id }) => {
               </div>
               <p className="text-gray-600">{commodityData.description}</p>
               {
-                commodityData.fields && JSON.parse(commodityData.fields).map((field: any, i: number) => (
+                notcall ? commodityData.agent?.fields && JSON.parse(commodityData.agent?.fields).map((field: any, i: number) => (
+                  <div key={i} className="flex justify-between border p-1 my-3">
+                    <div><b>{field.title}</b></div>
+                    <div>{field.value}</div>
+                  </div>
+                )) : commodityData.fields && JSON.parse(commodityData.fields).map((field: any, i: number) => (
                   <div key={i} className="flex justify-between border p-1 my-3">
                     <div><b>{field.title}</b></div>
                     <div>{field.value}</div>
@@ -183,12 +220,19 @@ const Commodity: React.FC<CommodityProps> = ({ onClose, id }) => {
               >
                 بستن
               </button>
-              <button
+              {
+                !notcall ? <button
                 className="my-2 float-left text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
                 onClick={handleCall}
               >
                 تماس
-              </button>
+              </button> : (commodityData.agent && !commodityData.agent.accepted && <button
+                className="my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                onClick={handleAdminAccept}
+              >
+                تایید
+              </button>)
+              }
             </div>
           </>
         ) : (

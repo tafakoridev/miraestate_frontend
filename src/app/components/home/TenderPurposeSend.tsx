@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Notify } from 'notiflix';
 import { GetToken } from '@/app/utils/Auth';
 import { table } from 'console';
+import GateWay from './GateWay';
 
 interface TenderPurposeSendProps {
   onClose: () => void;
@@ -203,6 +204,7 @@ useEffect(() => {
               </tbody>
             </table>
           }
+          <GateWay />
           <button
             className={`cursor-pointer my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-1.5 text-center mb-2`}
             onClick={handlePay}

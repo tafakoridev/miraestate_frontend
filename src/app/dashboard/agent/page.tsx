@@ -45,6 +45,7 @@ interface Commodity {
   agent_id: number;
   user: User;
   local: number;
+  accepted: number;
 }
 
 function AgentIn() {
@@ -52,7 +53,9 @@ function AgentIn() {
   const [type, setType] = useState<string>("");
   const [id, setId] = useState<string>("");
   const [is_open, setModal] = useState<boolean>(false);
+  const [accepted, setAccepted] = useState<boolean>(false);
   const [is_open_decline, setIsDecline] = useState<boolean>(false);
+
   const fetchAgentInData = async () => {
     Loading.pulse();
     const token = GetToken();
@@ -75,6 +78,40 @@ function AgentIn() {
   useEffect(() => {
     fetchAgentInData();
   }, []); // Empty dependency array to ensure the effect runs only once on mount
+
+  const handleAccepted = async (id: number) => {
+    const token = GetToken();
+    Loading.pulse();
+
+    try {
+      // Send request to /users/agents/desk with decline and token
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/agents/accept`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ id }),
+        }
+      );
+
+      if (response.ok) {
+        Loading.remove();
+        Notify.init({
+          width: "300px",
+          position: "left-bottom",
+        });
+        Notify.success("درخواست کارشناسی  با موفقیت تایید شد");
+        fetchAgentInData();
+      } else {
+        console.error("Failed to send decline:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error sending decline:", error);
+    }
+  };
 
   return (
     <div>
@@ -127,6 +164,9 @@ function AgentIn() {
                   </th>
                   <th className="border text-blue-800 bg-slate-300 h-[40px]">
                     عملیات
+                  </th>
+                  <th className="border text-blue-800 bg-slate-300 h-[40px]">
+                    اطلاعات تماس
                   </th>
                   {/* Add more headers as needed */}
                 </tr>
@@ -195,17 +235,40 @@ function AgentIn() {
                       )}
                     </td>
                     <td className="border border-slate-300">
-                      <div className="flex justify-center">
-                        <button
-                          className="w-30 my-2 text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
-                          onClick={() => {
-                            setId(String(commodity.id));
-                            setIsDecline(true);
-                          }}
-                        >
-                          رد کردن
-                        </button>
+                      <div className="flex justify-center gap-1">
+                        {!commodity.accepted ? (
+                          <>
+                            <button
+                              className="w-30 my-2 text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                              onClick={() => {
+                                setId(String(commodity.id));
+                                setIsDecline(true);
+                              }}
+                            >
+                              رد کردن
+                            </button>
+
+                            <button
+                              className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                              onClick={() => {
+                                handleAccepted(commodity.id);
+                              }}
+                            >
+                              تایید
+                            </button>
+                          </>
+                        ) : (
+                          <span>تایید شده</span>
+                        )}
                       </div>
+                    </td>
+                    <td className="border border-slate-300">
+                      {commodity.user && commodity.accepted ? (
+                        <div className="flex flex-col">
+                          <span>{commodity.user.name}</span>
+                          <span>{commodity.user.phonenumber}</span>
+                        </div>
+                      ) : <span>-</span>}
                     </td>
                   </tr>
                 ))}

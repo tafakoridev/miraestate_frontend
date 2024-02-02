@@ -1,5 +1,6 @@
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
+import GateWay from "../home/GateWay";
 
 interface Step {
   title: string;
@@ -82,6 +83,7 @@ function ExpertStep6({ title,  previousStep, nextStep, categoryId }: Step) {
           </div>
         </div>
       </div>
+      <GateWay />
       <div className="max-w-md mx-auto bg-white p-6 rounded-md ">
         <label className="block text-gray-700 text-sm font-bold mb-2">
           <input

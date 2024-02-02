@@ -19,6 +19,8 @@ interface AGENT {
   description: string;
   comment: string;
   rate: number;
+  agent: User;
+  accepted: number;
 }
 interface Commodity {
   id: number;
@@ -33,6 +35,7 @@ interface Commodity {
   category: Category;
   expired_at: string;
   agent: AGENT;
+  accepted: number;
 }
 
 function Commodities() {
@@ -323,8 +326,12 @@ function Commodities() {
               {/* <th className="border text-blue-800 bg-slate-300">ویرایش</th>
               <th className="border text-blue-800 bg-slate-300">حذف</th>
               <th className="border text-blue-800 bg-slate-300">انقضا</th> */}
+              <th className="border text-blue-800 bg-slate-300">
+                اطلاعات تماس
+              </th>
               <th className="border text-blue-800 bg-slate-300">نظر کارشناس</th>
               <th className="border text-blue-800 bg-slate-300">عملیات</th>
+              <th className="border text-blue-800 bg-slate-300">وضعیت</th>
             </tr>
           </thead>
           <tbody>
@@ -391,15 +398,24 @@ function Commodities() {
                 {/* <td className="w-1/12 border border-slate-300 ">
                   {remainedDays(commodity.expired_at)} روز دیگر
                 </td> */}
+                <td className={`border border-slate-300`}>
+                  {commodity.agent && (
+                    <div className="flex flex-col">
+                      <span>{commodity.agent.agent.name}</span>
+                      <span>{commodity.agent.agent.phonenumber}</span>
+                    </div>
+                  )}
+                </td>
                 <td
                   className={`${
                     commodity.agent ? "w-1/4" : "w-1/12"
                   } border border-slate-300`}
                 >
-                  <div className="flex justify-center items-center flex-col gap-3">
-                    <b>نظر کارشناس: </b>
-                    {commodity.agent ? commodity.agent.description : "ندارد"}
-                    {commodity.local == 0 && (
+                  {commodity.agent && commodity.agent.accepted === 1 ? (
+                    <div className="flex justify-center items-center flex-col gap-3">
+                      <b>نظر کارشناس: </b>
+                      {commodity.agent ? commodity.agent.description : "ندارد"}
+                      {commodity.local == 0 && (
                         <b
                           className={
                             "bg-red-300 p-1 text-xs rounded-md text-red-800"
@@ -426,35 +442,36 @@ function Commodities() {
                           بازدید در محل انجام شد
                         </b>
                       )}
-                    <br />
-                    {commodity.agent?.comment ? (
-                      <p>
-                        <hr />
-                        <b>نظر شما: </b>
-                        <br />
-                        {commodity.agent.comment}
-                        <hr />
-                        <div className="flex justify-center">
-                          <Star count={commodity.agent.rate} />
-                        </div>
-                      </p>
-                    ) : (
-                      <button
-                        onClick={() => setOpenComment(commodity.id)}
-                        className="bg-blue-500 text-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs"
-                      >
-                        نظردهی
-                      </button>
-                    )}
-                    {commodity.local && commodity.local !== 3 && (
-                      <button
-                        onClick={() => handleAgentReview(commodity.id)}
-                        className="bg-blue-500 text-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs"
-                      >
-                        تایید بازدید
-                      </button>
-                    )}
-                  </div>
+                      <br />
+                      {commodity.agent?.comment ? (
+                        <p>
+                          <hr />
+                          <b>نظر شما: </b>
+                          <br />
+                          {commodity.agent.comment}
+                          <hr />
+                          <div className="flex justify-center">
+                            <Star count={commodity.agent.rate} />
+                          </div>
+                        </p>
+                      ) : (
+                        <button
+                          onClick={() => setOpenComment(commodity.id)}
+                          className="bg-blue-500 text-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs"
+                        >
+                          نظردهی
+                        </button>
+                      )}
+                      {commodity.local && commodity.local !== 3 && (
+                        <button
+                          onClick={() => handleAgentReview(commodity.id)}
+                          className="bg-blue-500 text-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs"
+                        >
+                          تایید بازدید
+                        </button>
+                      )}
+                    </div>
+                  ) : <span>در انتظار...</span>}
                 </td>
                 <td className={`border border-slate-300`}>
                   <div className="flex justify-center items-center flex-col gap-3">
@@ -465,6 +482,9 @@ function Commodities() {
                       انتشار عمومی
                     </button>
                   </div>
+                </td>
+                <td className={`border border-slate-300`}>
+                  {commodity.accepted ? "تایید شده" : "تایید نشده"}
                 </td>
               </tr>
             ))}

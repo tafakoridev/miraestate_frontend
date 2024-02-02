@@ -1,7 +1,5 @@
 "use client";
-// components/Home.tsx
 import Image from "next/image";
-
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { GetToken, GetUser, IsLogin } from "./utils/Auth";
@@ -94,7 +92,7 @@ const Home: React.FC = () => {
       await fetchCommodities(type, category_id);
     } else {
       // Perform the filtering based on the entered text
-      const filteredCommodities = commodities.filter((commodity) =>
+      const filteredCommodities = commodities.filter((commodity: any) =>
         commodity.title.includes(searchText)
       );
       setCommodities(filteredCommodities);
@@ -210,6 +208,7 @@ const Home: React.FC = () => {
       {commodity_id && (type === "commodity" || !type) && (
         <Commodity
           id={commodity_id}
+          notcall={false}
           onClose={() => {
             setCommodity_id("");
           }}
@@ -369,7 +368,8 @@ const Home: React.FC = () => {
           <SidebarDivar setOptions={setOptions} />
         </div>
         <div className="flex gap-5 flex-wrap justify-center overflow-auto md:w-5/6 w-full">
-          {commodities.map((el, i) => (
+          
+          {commodities.map((el: any, i: any) => (
             <Kala
               id={el.id}
               select={async (id: any) => setCommodity_id(id)}
@@ -377,7 +377,7 @@ const Home: React.FC = () => {
               title={el.title}
               price={el.price}
               type={type}
-              imageSrc={type !== 'Commodity' ? null : `http://127.0.0.1:8000${el.picture}`}
+              imageSrc={type !== 'Commodity' ? `http://127.0.0.1:8000${JSON.parse(el.picture)[0]}` : `http://127.0.0.1:8000${JSON.parse(el.picture)[0]}`}
               agent={el.agent ? true : false}
             />
           ))}

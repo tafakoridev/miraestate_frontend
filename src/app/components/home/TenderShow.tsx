@@ -1,7 +1,7 @@
 // Tender.tsx
 import { useState, useEffect } from "react";
 import { Loading, Notify } from "notiflix";
-import { GetToken } from "@/app/utils/Auth";
+import { GetToken, IsLogin } from "@/app/utils/Auth";
 import Image from "next/image";
 import TenderPurposeSend from "./TenderPurposeSend";
 
@@ -45,6 +45,8 @@ const TenderShow: React.FC<TenderProps> = ({ onClose, id }) => {
   const [TenderData, setTenderData] = useState<TenderData | null>(
     null
   );
+  const isLoggedIn = IsLogin();
+
   const [showTenderPurposeSend, setShowTenderPurposeSend] = useState(false);
 
   const handleSendPurposeClick = () => {
@@ -95,6 +97,18 @@ const TenderShow: React.FC<TenderProps> = ({ onClose, id }) => {
     } else {
       Notify.warning("Phone number not available.");
     }
+  };
+
+  
+  const handleNavigate = (e: any) => {
+    e.preventDefault();
+    // Open the "/rules" page in a new tab
+    window.open("/rules", "_blank");
+  };
+
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const handleCheckboxChange = () => {
+    setAgreedToTerms(!agreedToTerms);
   };
 
   return (
@@ -180,9 +194,29 @@ const TenderShow: React.FC<TenderProps> = ({ onClose, id }) => {
               >
                 بستن
               </button>
+              <div className="bg-white p-6 rounded-md ">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  <input
+                    type="checkbox"
+                    id="termsCheckbox"
+                    className="mx-2"
+                    checked={agreedToTerms}
+                    onChange={handleCheckboxChange}
+                  />
+                  با{" "}
+                  <span
+                    className="text-blue-500 cursor-pointer"
+                    onClick={handleNavigate}
+                  >
+                    قوانین
+                  </span>{" "}
+                  سایت موافق هستم
+                </label>
+              </div>
                   <button
-                className="my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
-                onClick={handleSendPurposeClick}
+              disabled={!agreedToTerms}
+              className={`${!agreedToTerms ? 'cursor-not-allowed' : 'cursor-pointer'}  my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2`}
+                onClick={isLoggedIn ? handleSendPurposeClick : () => Notify.failure("لطفا ابتدا لاگین کنید")}
               >
                 ارسال پیشنهاد
               </button>

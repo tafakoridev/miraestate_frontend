@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SelectSearch from "react-select-search";
 
 interface Step {
   title: string;
@@ -19,31 +20,38 @@ interface S2BKP {
   selectedCity: string;
 }
 
-interface Province {
-  id: number;
+interface Option {
+  value: string;
   name: string;
-}
-
-function ExpertStep2({
-  title,
-  setCityId,
-  previousStep,
-  nextStep,
-  bkp,
-  setBKP,
-}: Step) {
-  const [cities, SetCities] = useState<City[]>([]);
-  const [provinces, SetProvinces] = useState<Province[]>([]);
-  const [selectedProvince, SetSelectedProvince] = useState(
-    bkp.selectedProvince
-  );
-  const [selectedCity, SetSelectedCity] = useState(bkp.selectedCity);
-  const [disabled, SetDisabled] = useState(true);
-
-  useEffect(() => {
-    getProvinces();
-  }, []);
-
+  }
+  
+  interface Province {
+    id: number;
+    name: string;
+  }
+  
+  function ExpertStep2({
+    title,
+    setCityId,
+    previousStep,
+    nextStep,
+    bkp,
+    setBKP,
+  }: Step) {
+    const [cities, SetCities] = useState<City[]>([]);
+    const [provinces, SetProvinces] = useState<Province[]>([]);
+    const [selectedProvince, SetSelectedProvince] = useState(
+      bkp.selectedProvince
+      );
+      const [options, setOptions] = useState<Option[]>([]);
+      const [options2, setOptions2] = useState<Option[]>([]);
+      const [selectedCity, SetSelectedCity] = useState(bkp.selectedCity);
+      const [disabled, SetDisabled] = useState(true);
+      
+      useEffect(() => {
+        getProvinces();
+      }, []);
+      
   function checkConditions() {
     const cityNotSelected = cities.length > 0 && selectedCity === "0";
     SetDisabled(cityNotSelected);
@@ -106,12 +114,45 @@ function ExpertStep2({
     }
   };
 
+  useEffect(() => {
+    // Use a functional update to ensure correct state updates
+    setOptions(prevOptions => (
+      provinces.map(province => ({
+        value: String(province.id),
+        name: province.name
+      }))
+    ));
+  
+  }, [provinces]);
+
+  useEffect(() => {
+    // Use a functional update to ensure correct state updates
+    setOptions2((prevOptions) =>
+    cities.map((city) => ({
+        value: String(city.id),
+        name: city.name,
+      }))
+    );
+
+  }, [cities]);
+
   return (
     <div className="border p-5 rounded-md shadow min-h-[250px] min-w-[250px] flex justify-between gap-3 flex-col items-center">
       <h2>{title}</h2>
       {/* first */}
       <div className="relative inline-block w-64">
-        <select
+      {options.length > 0 && (
+          <SelectSearch
+          value={selectedProvince}
+            onChange={(value) => {
+              SetSelectedProvince(String(value));
+            }}
+            search={true}
+            options={options}
+            placeholder="انتخاب استان"
+          />
+        )}
+        {/* <select
           value={selectedProvince}
           onChange={(e) => {
             SetSelectedProvince(e.target.value);
@@ -126,7 +167,7 @@ function ExpertStep2({
               {province.name}
             </option>
           ))}
-        </select>
+        </select> */}
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
           <svg
             className="h-4 w-4"
@@ -142,7 +183,18 @@ function ExpertStep2({
       {/* second */}
       {cities.length > 0 && (
         <div className="relative inline-block w-64">
-          <select
+           {options2.length > 0 && (
+          <SelectSearch
+          value={selectedCity}
+            onChange={(value) => {
+              SetSelectedCity(String(value));
+            }}
+            search={true}
+            options={options2}
+            placeholder="انتخاب شهر"
+          />
+        )}
+          {/* <select
             value={selectedCity}
             onChange={(e) => {
               SetSelectedCity(e.target.value);
@@ -157,7 +209,7 @@ function ExpertStep2({
                 {city.name}
               </option>
             ))}
-          </select>
+          </select> */}
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
             <svg
               className="h-4 w-4"

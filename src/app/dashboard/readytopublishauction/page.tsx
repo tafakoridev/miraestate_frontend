@@ -12,7 +12,10 @@ interface Agent {
 interface Purpose {
   id: number;
   description: string;
+  price: number;
   user: User;
+  user_id: number;
+  purposeable_id: number;
 }
 
 interface Auction {
@@ -30,6 +33,7 @@ interface Auction {
   end: string;
   fields: string;
   is_active: boolean;
+  winner: User;
 }
 
 interface Field {
@@ -40,10 +44,14 @@ interface Field {
 function ReadyToPublish() {
   const [auctions, setauctions] = useState<Auction[]>([]);
 
-  const [selectedAuctionId, setSelectedAuctionId] = useState<number | null>(null);
+  const [selectedAuctionId, setSelectedAuctionId] = useState<number | null>(
+    null
+  );
   const [showAuctionPurposeList, setShowAuctionPurposeList] = useState(false);
   const [IsAgentSelect, setIsAgentSelect] = useState(false);
-
+  const [AuctionPurposeList_, setAuctionPurposeList] = useState<Purpose[] | []>(
+    []
+  );
 
   const handleAcceptPurpose = async (AuctionId: number) => {
     Loading.pulse();
@@ -59,15 +67,14 @@ function ReadyToPublish() {
       );
       const data = await response.json();
       Notify.init({
-        width: '300px',
-        position: 'left-bottom',
-        });
-      if(data === 1) {
-        Notify.success("با موفقیت تایید شد")
-        fetchauctions()
+        width: "300px",
+        position: "left-bottom",
+      });
+      if (data === 1) {
+        Notify.success("با موفقیت تایید شد");
+        fetchauctions();
       }
-      
-      
+
       Loading.remove();
     } catch (error) {
       console.error("Error fetching auctions:", error);
@@ -88,7 +95,7 @@ function ReadyToPublish() {
       );
       const data = await response.json();
       setauctions(data.auctions);
-      
+
       Loading.remove();
     } catch (error) {
       console.error("Error fetching auctions:", error);
@@ -97,6 +104,12 @@ function ReadyToPublish() {
   useEffect(() => {
     fetchauctions();
   }, []); // Empty dependency array to ensure the effect runs only once on mount
+
+  const handleShowTenderPurposeList = (Auction: Auction) => {
+    setSelectedAuctionId(Auction.id);
+    setAuctionPurposeList(Auction.purpose);
+    setShowAuctionPurposeList(true);
+  };
 
   const handleDeleteAuction = async (id: number) => {
     const token = GetToken();
@@ -147,59 +160,99 @@ function ReadyToPublish() {
             <th className="border text-blue-800 bg-slate-300">فیلدها</th>
             <th className="border text-blue-800 bg-slate-300">عملیات</th>
             <th className="border text-blue-800 bg-slate-300">پیشنهادها</th>
+            <th className="border text-blue-800 bg-slate-300">وضعیت</th>
           </tr>
         </thead>
         <tbody>
           {auctions.map((auction) => (
-            <tr key={auction.id}>
+            <tr
+              key={auction.id}
+              className={auction.is_active ? `bg-green-50` : `bg-red-50`}
+            >
               <td className="border border-slate-300">{auction.title}</td>
               <td className="border border-slate-300 w-1/3">
                 {auction.description}
               </td>
               <td className="border border-slate-300">{auction.price}تومان</td>
               <td className="border border-slate-300">
-                از  &nbsp;<span dir="ltr">{moment(auction.start).format("jYYYY-jM-jD")}</span>
-                &nbsp;
-                تا 
-                &nbsp;
-                <span dir="ltr">{moment(auction.end).format("jYYYY-jM-jD")}</span>
+                از &nbsp;
+                <span dir="ltr">
+                  {moment(auction.start).format("jYYYY-jM-jD")}
+                </span>
+                &nbsp; تا &nbsp;
+                <span dir="ltr">
+                  {moment(auction.end).format("jYYYY-jM-jD")}
+                </span>
               </td>
               <td className="border border-slate-300">{auction.address}</td>
               <td className="border border-slate-300">
-              {auction.fields && 
-                JSON.parse(auction.fields).map((field: Field, i: number) => (
-                  <div key={i} className="flex justify-between border p-1 my-3">
-                    <div><b>{field.title}</b></div>
-                    <div>{field.value}</div>
-                  </div>
-                ))
-              }
+                {auction.fields &&
+                  JSON.parse(auction.fields).map((field: Field, i: number) => (
+                    <div
+                      key={i}
+                      className="flex justify-between border p-1 my-3"
+                    >
+                      <div>
+                        <b>{field.title}</b>
+                      </div>
+                      <div>{field.value}</div>
+                    </div>
+                  ))}
               </td>
               <td className="border border-slate-300">
                 <div className="flex justify-evenly">
                   {/* <button className="w-20 my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => handleEditAuction(Auction.id)}>ویرایش</button> */}
                   <button
-                    className="w-20 my-2 float-left text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                    className="w-30 my-2 float-left text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
                     onClick={() => handleDeleteAuction(auction.id)}
                   >
                     حذف
                   </button>
                 </div>
+                {!auction.is_active && (
+                  <div className="flex justify-center">
+                    <button
+                      className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                      onClick={() => handleAcceptPurpose(auction.id)}
+                    >
+                      تایید{" "}
+                    </button>
+                  </div>
+                )}
               </td>
               <td className="border border-slate-300">
                 <div className="flex justify-center">
-                  <button
-                    className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
-                    onClick={() => handleAcceptPurpose(auction.id)}
-                  >
-                    تایید
-                  </button>
+                  {auction.winner ? (
+                    <div className="flex flex-col">
+                      <b>برنده</b>
+                      <span>{auction.winner.name}</span>
+                      <span> {auction.winner.phonenumber}</span>
+                    </div>
+                  ) : (
+                    <button
+                      className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                      onClick={() => handleShowTenderPurposeList(auction)}
+                    >
+                      پیشنهادها
+                    </button>
+                  )}
                 </div>
+              </td>
+
+              <td className="border border-slate-300">
+                {auction.is_active ? "تایید شده" : "تایید نشده"}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {showAuctionPurposeList && selectedAuctionId && AuctionPurposeList_ && (
+        <AuctionPurposeList
+          purposes={AuctionPurposeList_}
+          onClose={() => setShowAuctionPurposeList(false)}
+          onAcceptPurpose={handleAcceptPurpose}
+        />
+      )}
     </div>
   );
 }

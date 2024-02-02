@@ -8,8 +8,8 @@ function Kala({ title, price, imageSrc, select, id, agent, type }: any) {
             {agent && <span className="inline-block bg-green-500 text-white px-2 py-1 rounded-full text-sm font-semibold absolute top-1 left-1 z-40">کارشناسی شده</span>}
 
                 <Image 
-                    loader={() => `${imageSrc ?? (type === 'tender' ? "/assets/tender.jpg" : "/assets/auction.jpg")}`}
-                    src={`${imageSrc ?? (type === 'tender' ? "/assets/tender.jpg" : "/assets/auction.jpg")}`}
+                    loader={() => `${imageSrc ?? (type === 'tender' ? imageSrc : imageSrc)}`}
+                    src={`${imageSrc ?? (type === 'tender' ? imageSrc : imageSrc)}`}
                     width={200}
                     height={200}
                     alt={title}

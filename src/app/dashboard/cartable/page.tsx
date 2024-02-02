@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import moment from "moment";
 import Publish from "@/app/components/dashboard/Publish";
+import Commodity from "@/app/components/home/Commodity";
 
 interface City {
   name: string;
@@ -29,12 +30,14 @@ interface Commodity {
   category: Category;
   expired_at: string;
   agent: AGENT;
+  published: number;
 }
 
 function Commodities() {
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [selectedPicture, setSelectedPicture] = useState(null);
   const [publish, setPublish] = useState(0);
+  const [show, setShow] = useState(0);
 
   const openModal = (picture: any) => {
     setSelectedPicture(picture);
@@ -214,6 +217,7 @@ function Commodities() {
       
       {commodities.map((commodity, o) => (
         <div key={o}>
+          {show === commodity.id && <Commodity id={String(show)} notcall={true}  onClose={() => setShow(0)}/>}
           {publish === commodity.id && <Publish id={commodity.id} onClose={() => {setPublish(0); fetchCommodities();}}/>}
           {selectedPicture && (
             <div
@@ -328,9 +332,17 @@ function Commodities() {
                   {commodity.agent ? commodity.agent.description : "ندارد"}
                 </td>
                 <td className={`border border-slate-300`}>
+                {
+                  commodity.published === 1 && 
                   <div className="flex justify-center items-center flex-col gap-3">
                     <button onClick={() => setPublish(commodity.id)} className="bg-blue-500 text-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs">
                       انتشار عمومی
+                    </button>
+                  </div>
+                }
+                <div className="flex justify-center items-center flex-col gap-3">
+                    <button onClick={() => setShow(commodity.id)} className="bg-blue-500 text-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs">
+                      مشاهده
                     </button>
                   </div>
                 </td>

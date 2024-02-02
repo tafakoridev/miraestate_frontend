@@ -52,6 +52,21 @@ function Tenders() {
   const [TenderPurposeList_, setTenderPurposeList] = useState<Purpose[] | []>(
     []
   );
+
+
+  function findWinnerPurpose(tender: Tender): Purpose | undefined {
+    const winnerUser = tender.winner;
+    if (winnerUser) {
+      // Find the purpose associated with the winner user
+      const winnerPurpose = tender.purpose.find(purpose => purpose.user_id === winnerUser.id);
+  
+      return winnerPurpose;
+    }
+  
+    return undefined; // Return undefined if no winner user is specified
+  }
+
+
   const handleShowTenderPurposeList = (Tender: Tender) => {
     setSelectedTenderId(Tender.id);
     setTenderPurposeList(Tender.purpose);
@@ -177,7 +192,7 @@ function Tenders() {
             <th className="border text-blue-800 bg-slate-300">آدرس</th>
             <th className="border text-blue-800 bg-slate-300">فیلدها</th>
             <th className="border text-blue-800 bg-slate-300">عملیات</th>
-            <th className="border text-blue-800 bg-slate-300">پیشنهادها</th>
+            <th className="border text-blue-800 bg-slate-300">برنده</th>
             <th className="border text-blue-800 bg-slate-300">وضعیت</th>
           </tr>
         </thead>
@@ -218,40 +233,54 @@ function Tenders() {
                 <div className="flex justify-evenly">
                   {/* <button className="w-20 my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => handleEditTender(tender.id)}>ویرایش</button> */}
                   <button
-                    className="w-20 my-2 float-left text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                    className="w-20 my-2 float-left text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-xs px-4 py-1.5 text-center mb-2"
                     onClick={() => handleDeleteTender(tender.id)}
                   >
                     حذف
                   </button>
                   {/* <button className="w-20 my-2 float-left text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2" onClick={() => handleEditTender(tender.id)}>ویرایش</button> */}
-                  {tender.is_active !== 3 && (
+                  {tender.is_active !== 3 && tender.is_active !== 5 && (
                     <button
-                      className="w-30 my-2 float-left text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                      className="w-30 my-2 float-left text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg px-4 py-1.5 text-center mb-2 text-xs"
                       onClick={() => handleEndTender(tender.id)}
                     >
-                      اعلام پایان
+                      اعلام پایان 
                     </button>
                   )}
+                  {/* {tender.is_active !== 3 && (
+                    <button
+                      className="w-30 my-2 float-left text-white bg-gradient-to-r from-gray-500 via-gray-600 to-gray-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 font-medium rounded-lg text-xs px-4 py-1.5 text-center mb-2"
+                      onClick={() => handleEndTender(tender.id)}
+                    >
+                      اعلام پایان ناموفق
+                    </button>
+                  )} */}
                 </div>
               </td>
               <td className="border border-slate-300">
                 <div className="flex justify-center">
                   {tender.winner ? (
                     <div className="flex flex-col">
-                      <b>برنده</b>
                       <span>{tender.winner.name}</span>
                       <span> {tender.winner.phonenumber}</span>
+                      <hr className="hr"/>
+                      <span> {findWinnerPurpose(tender)?.price} تومان</span>
+                      <span> {findWinnerPurpose(tender)?.description}</span>
                     </div>
-                  ) : <button
+                  ) : <span>-</span>}
+                  {/* <button
                   className="w-30 my-2 text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
                   onClick={() => handleShowTenderPurposeList(tender)}
                 >
                   پیشنهادها
-                </button>}
+                </button> */}
                 </div>
               </td>
               <td className="border border-slate-300">
-                {tender.is_active ? "تایید شده" : "تایید نشده"}
+                {tender.is_active === 2 && "تایید شده"}
+                {tender.is_active === 1 && "تایید نشده"}
+                {tender.is_active === 5 && "در انتظار پایان"}
+                {tender.is_active === 3 && "پایان یافته"}
               </td>
             </tr>
           ))}

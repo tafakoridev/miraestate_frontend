@@ -47,7 +47,7 @@ function ExpertStep5({ title,  previousStep, nextStep, submit }: Step) {
           }}
           className={`${true ? "from-blue-500 to-blue-700 hover:from-blue-700 hover:to-blue-900" : "from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-200"} cursor-pointer  bg-gradient-to-r  text-white font-bold pt-2 pb-1 mt-1 px-4 rounded`}
         >
-          پرداخت
+          بعدی
         </button>
       </div>
     </div>
