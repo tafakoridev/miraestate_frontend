@@ -35,6 +35,7 @@ interface Commodity {
   category: Category;
   expired_at: string;
   agent: AGENT;
+  agentof: User;
   accepted: number;
 }
 
@@ -399,10 +400,10 @@ function Commodities() {
                   {remainedDays(commodity.expired_at)} روز دیگر
                 </td> */}
                 <td className={`border border-slate-300`}>
-                  {commodity.agent && (
+                  {commodity.agentof && (
                     <div className="flex flex-col">
-                      <span>{commodity.agent.agent.name}</span>
-                      <span>{commodity.agent.agent.phonenumber}</span>
+                      <span>{commodity.agentof.name}</span>
+                      <span>{commodity.agentof.phonenumber}</span>
                     </div>
                   )}
                 </td>

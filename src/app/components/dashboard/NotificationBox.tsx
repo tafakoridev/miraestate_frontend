@@ -155,7 +155,7 @@ const NotificationBox: React.FC<NotificationBoxProps> = ({
             <li
               onClick={() =>
                 router.push(
-                  `/dashboard/tenders/list`
+                  `/dashboard/clientcartable`
                 )
               }
               className="py-2 border-b-2"
