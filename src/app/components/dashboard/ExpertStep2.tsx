@@ -144,7 +144,7 @@ interface Option {
       {options.length > 0 && (
           <SelectSearch
           value={selectedProvince}
-            onChange={(value) => {
+            onChange={(value: any) => {
               SetSelectedProvince(String(value));
             }}
             search={true}
@@ -186,7 +186,7 @@ interface Option {
            {options2.length > 0 && (
           <SelectSearch
           value={selectedCity}
-            onChange={(value) => {
+            onChange={(value: any) => {
               SetSelectedCity(String(value));
             }}
             search={true}
