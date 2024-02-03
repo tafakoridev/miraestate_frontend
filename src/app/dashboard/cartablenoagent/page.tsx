@@ -6,6 +6,8 @@ import { GetToken } from "@/app/utils/Auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import moment from "moment";
+import Publish from "@/app/components/dashboard/Publish";
+import Commodity from "@/app/components/home/Commodity";
 
 interface City {
   name: string;
@@ -31,9 +33,11 @@ interface Commodity {
   published: number;
 }
 
-function Commodities() {
+function CommoditiesNoagent() {
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [selectedPicture, setSelectedPicture] = useState(null);
+  const [publish, setPublish] = useState(0);
+  const [show, setShow] = useState(0);
 
   const openModal = (picture: any) => {
     setSelectedPicture(picture);
@@ -62,15 +66,13 @@ function Commodities() {
   }
 
   const router = useRouter();
-
-  useEffect(() => {
     // Fetch commodities from /commodities endpoint
     const fetchCommodities = async () => {
       Loading.pulse();
       const token = GetToken();
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/noagent/get/all`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/commodities/noagent/get/list`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -86,6 +88,8 @@ function Commodities() {
         console.error("Error fetching commodities:", error);
       }
     };
+  useEffect(() => {
+
 
     fetchCommodities();
   }, []);
@@ -170,7 +174,7 @@ function Commodities() {
     try {
       // Post new commodity with the specified data
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/commodities/noagent/get/list`,
         {
           method: "POST",
           headers: {
@@ -210,8 +214,11 @@ function Commodities() {
 
   return (
     <div>
+      
       {commodities.map((commodity, o) => (
         <div key={o}>
+          {show === commodity.id && <Commodity id={String(show)} notcall={true}  onClose={() => setShow(0)}/>}
+          {publish === commodity.id && <Publish id={commodity.id} onClose={() => {setPublish(0); fetchCommodities();}}/>}
           {selectedPicture && (
             <div
               onClick={(e) => e.target === e.currentTarget && closeModal()}
@@ -248,9 +255,9 @@ function Commodities() {
               <th className="border text-blue-800 bg-slate-300">تصویر</th>
               {/* <th className="border text-blue-800 bg-slate-300">ویرایش</th>
               <th className="border text-blue-800 bg-slate-300">حذف</th>
-              <th className="border text-blue-800 bg-slate-300">انقضا</th> */}
-              <th className="border text-blue-800 bg-slate-300">عملیات</th>
-              <th className="border text-blue-800 bg-slate-300">وضعیت</th>
+            <th className="border text-blue-800 bg-slate-300">انقضا</th> */}
+              {/* <th className="border text-blue-800 bg-slate-300">نظر کارشناس</th> */}
+            <th className="border text-blue-800 bg-slate-300">عملیات</th>
             </tr>
           </thead>
           <tbody>
@@ -262,7 +269,7 @@ function Commodities() {
                   {commodity.description}
                 </td>
                 <td className="border border-slate-300 w-1/12">
-                  {commodity.price == 0.0 ? "---" : `${commodity.price}تومان `}
+                  {commodity.price == 0.00 ? '---': `${commodity.price}تومان `} 
                 </td>
                 <td className="border border-slate-300 w-1/12">
                   {commodity.city?.name}
@@ -294,14 +301,6 @@ function Commodities() {
                     )}
                   </div>
                 </td>
-                <td className="border border-slate-300 w-1/12">
-                  <button
-                    className=" text-white bg-gradient-to-r from-red-500 via-red-600 to-red-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
-                    onClick={() => handleDeleteCommodity(commodity.id)}
-                  >
-                    حذف
-                  </button>
-                </td>
                 {/* <td className="border border-slate-300 w-1/12">
                   <button
                     className=" text-white bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
@@ -332,8 +331,20 @@ function Commodities() {
                 >
                   {commodity.agent ? commodity.agent.description : "ندارد"}
                 </td> */}
-                <td className="border border-slate-300 w-1/12">
-                  {commodity.published === 2 ? "منتشر شده" : "منتشر نشده"}
+                <td className={`border border-slate-300`}>
+                {
+                  commodity.published === 1 && 
+                  <div className="flex justify-center items-center flex-col gap-3">
+                    <button onClick={() => setPublish(commodity.id)} className="bg-blue-500 text-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs">
+                      انتشار عمومی
+                    </button>
+                  </div>
+                }
+                <div className="flex justify-center items-center flex-col gap-3">
+                    <button onClick={() => setShow(commodity.id)} className="bg-blue-500 text-white justify-self-start float-left w-[100px] h-[30px] rounded-md border border-gray-300 shadow-sm text-xs">
+                      مشاهده
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -344,4 +355,4 @@ function Commodities() {
   );
 }
 
-export default Commodities;
+export default CommoditiesNoagent;

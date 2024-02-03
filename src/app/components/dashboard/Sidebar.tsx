@@ -72,6 +72,12 @@ function Sidebar({ SetOpen, open }: any) {
             {isOpen === "cartable" && (
               <>
                 <Item
+                  title={"کارتابل کالا و خدمات "}
+                  path={"/dashboard/cartablenoagent"}
+                  icon={"/assets/icons8-pack-luggage-48.png"}
+                  child={true}
+                />
+                <Item
                   title={"کارتابل کارشناسی "}
                   path={"/dashboard/cartable"}
                   icon={"/assets/icons8-pack-luggage-48.png"}
